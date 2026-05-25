@@ -1,4 +1,4 @@
-<div class="game-overlay" (click)="$event.target === $event.currentTarget && closed.emit()">
+<div class="game-overlay">
   <div class="game-modal">
 
     <!-- Header -->
@@ -9,11 +9,11 @@
       </div>
 
       <div class="game-controls">
-        <label class="album-toggle" *ngIf="albums.length >= 2">
+        <label class="album-toggle" *ngIf="albums.length >= 2 && !isDuelMode">
           <input type="checkbox" [(ngModel)]="albumMode" />
           <span>Album-Modus</span>
         </label>
-        <button class="close-btn" (click)="closed.emit()">✕</button>
+        <button class="close-btn" (click)="close()">✕</button>
       </div>
     </div>
 
@@ -24,19 +24,86 @@
       <span class="score-item wrong">✗ {{ wrong }}</span>
     </div>
 
+    <!-- Duel live bar -->
+    <div class="duel-bar" *ngIf="isDuelMode && phase !== 'result'">
+      <div class="duel-side me">
+        <span class="duel-label">{{ 'duel.you' | t }}</span>
+        <span class="duel-score">{{ duelState?.myScore ?? correct }}</span>
+        <span class="duel-answered">({{ duelState?.myAnswered ?? 0 }}/{{ total }})</span>
+      </div>
+      <span class="duel-vs">⚔️</span>
+      <div class="duel-side opp">
+        <span class="duel-label">{{ 'duel.opponent' | t }}</span>
+        <span class="duel-score">{{ duelState?.opponentScore ?? '?' }}</span>
+        <span class="duel-answered">({{ duelState?.opponentAnswered ?? 0 }}/{{ total }})</span>
+      </div>
+    </div>
+
+    <!-- Timer bar (duel only, during question) -->
+    <div class="timer-bar-wrap" *ngIf="isDuelMode && phase === 'question' && selected === null">
+      <div
+        class="timer-bar-fill"
+        [style.width.%]="timerPercent"
+        [class.timer-warn]="timeLeft <= 5"
+      ></div>
+      <span class="timer-label">{{ timeLeft }}s</span>
+    </div>
+
     <!-- Result screen -->
     <div class="result-screen" *ngIf="phase === 'result'">
-      <div class="result-emoji">
-        {{ correct === total ? '🎉' : correct >= total * 0.7 ? '🔥' : correct >= total * 0.4 ? '😊' : '😅' }}
-      </div>
-      <h2>{{ correct }}/{{ total }} richtig</h2>
-      <p class="result-sub">
-        {{ correct === total ? 'Perfekt! Du kennst alle!' : correct >= total * 0.7 ? 'Sehr gut!' : correct >= total * 0.4 ? 'Gut gemacht!' : 'Noch etwas üben...' }}
-      </p>
-      <div class="result-actions">
-        <button class="btn primary" (click)="restart()">Nochmal spielen</button>
-        <button class="btn secondary" (click)="closed.emit()">Schließen</button>
-      </div>
+      <ng-container *ngIf="isDuelMode; else soloResult">
+
+        <!-- Waiting for final state -->
+        <ng-container *ngIf="waitingForFinalState">
+          <div class="result-emoji waiting-spin">⏳</div>
+          <p class="result-sub">{{ 'duel.waitingOpponent' | t }}</p>
+        </ng-container>
+
+        <!-- Final result -->
+        <ng-container *ngIf="!waitingForFinalState && duelState">
+          <div class="result-emoji">{{ duelResultLabel() }}</div>
+
+          <p *ngIf="duelState.opponentForfeited" class="result-sub forfeit-note">{{ 'duel.opponentQuit' | t }}</p>
+
+          <div class="duel-final-scores">
+            <div class="duel-final-side" [class.winner]="duelState.myScore > duelState.opponentScore">
+              <span class="duel-final-label">{{ 'duel.you' | t }}</span>
+              <span class="duel-final-score">{{ duelState.myScore }}</span>
+              <span class="duel-final-total">/ {{ duelState.total }}</span>
+            </div>
+            <span class="duel-final-sep">:</span>
+            <div class="duel-final-side" [class.winner]="duelState.opponentScore > duelState.myScore">
+              <span class="duel-final-score">{{ duelState.opponentScore }}</span>
+              <span class="duel-final-total">/ {{ duelState.total }}</span>
+              <span class="duel-final-label">{{ 'duel.opponent' | t }}</span>
+            </div>
+          </div>
+
+          <p class="result-verdict">
+            <ng-container *ngIf="duelState.myScore > duelState.opponentScore">{{ 'duel.youWon' | t }}</ng-container>
+            <ng-container *ngIf="duelState.myScore < duelState.opponentScore">{{ 'duel.opponentWon' | t }}</ng-container>
+            <ng-container *ngIf="duelState.myScore === duelState.opponentScore">{{ 'duel.tie' | t }}</ng-container>
+          </p>
+        </ng-container>
+
+        <div class="result-actions" *ngIf="!waitingForFinalState">
+          <button class="btn secondary" (click)="closed.emit()">Schließen</button>
+        </div>
+      </ng-container>
+
+      <ng-template #soloResult>
+        <div class="result-emoji">
+          {{ correct === total ? '🎉' : correct >= total * 0.7 ? '🔥' : correct >= total * 0.4 ? '😊' : '😅' }}
+        </div>
+        <h2>{{ correct }}/{{ total }} richtig</h2>
+        <p class="result-sub">
+          {{ correct === total ? 'Perfekt! Du kennst alle!' : correct >= total * 0.7 ? 'Sehr gut!' : correct >= total * 0.4 ? 'Gut gemacht!' : 'Noch etwas üben...' }}
+        </p>
+        <div class="result-actions">
+          <button class="btn primary" (click)="restart()">Nochmal spielen</button>
+          <button class="btn secondary" (click)="closed.emit()">Schließen</button>
+        </div>
+      </ng-template>
     </div>
 
     <!-- Question screen -->
@@ -109,9 +176,10 @@
         </div>
 
         <div class="answer-feedback" *ngIf="selected !== null">
-          <span *ngIf="selected === current.correctAnswer" class="feedback correct-text">Richtig! 🎉</span>
-          <span *ngIf="selected !== current.correctAnswer" class="feedback wrong-text">Falsch — es war: {{ current.correctAnswer }}</span>
-          <button class="btn primary next-btn" (click)="next()">
+          <span *ngIf="timedOut" class="feedback wrong-text">Zeit abgelaufen! ⏰ Es war: {{ current.correctAnswer }}</span>
+          <span *ngIf="!timedOut && selected === current.correctAnswer" class="feedback correct-text">Richtig! 🎉</span>
+          <span *ngIf="!timedOut && selected !== current.correctAnswer" class="feedback wrong-text">Falsch — es war: {{ current.correctAnswer }}</span>
+          <button class="btn primary next-btn" *ngIf="!timedOut" (click)="next()">
             {{ questionIndex + 1 >= total ? 'Ergebnis' : 'Weiter' }}
           </button>
         </div>

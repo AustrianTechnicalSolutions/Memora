@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj": {}
+    "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj": {}
   },
   "projects": {
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj": {
+    "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj",
+        "projectUniqueName": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj",
         "projectName": "db-query",
-        "projectPath": "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj",
-        "packagesPath": "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\obj\\",
+        "projectPath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj",
+        "packagesPath": "C:\\Users\\gajip\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\gajip\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "O96PSxzXBzY=",
+  "dgSpecHash": "45px1js9tjg=",
   "success": true,
-  "projectFilePath": "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj",
+  "projectFilePath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\tools\\db-query\\db-query.csproj",
   "expectedPackageFiles": [
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\microsoft.data.sqlite\\8.0.6\\microsoft.data.sqlite.8.0.6.nupkg.sha512",
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\microsoft.data.sqlite.core\\8.0.6\\microsoft.data.sqlite.core.8.0.6.nupkg.sha512",
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.6\\sqlitepclraw.bundle_e_sqlite3.2.1.6.nupkg.sha512",
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\sqlitepclraw.core\\2.1.6\\sqlitepclraw.core.2.1.6.nupkg.sha512",
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.6\\sqlitepclraw.lib.e_sqlite3.2.1.6.nupkg.sha512",
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.1.6\\sqlitepclraw.provider.e_sqlite3.2.1.6.nupkg.sha512",
-    "c:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\.dotnet-cli\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
+    "C:\\Users\\gajip\\.nuget\\packages\\microsoft.data.sqlite\\8.0.6\\microsoft.data.sqlite.8.0.6.nupkg.sha512",
+    "C:\\Users\\gajip\\.nuget\\packages\\microsoft.data.sqlite.core\\8.0.6\\microsoft.data.sqlite.core.8.0.6.nupkg.sha512",
+    "C:\\Users\\gajip\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.6\\sqlitepclraw.bundle_e_sqlite3.2.1.6.nupkg.sha512",
+    "C:\\Users\\gajip\\.nuget\\packages\\sqlitepclraw.core\\2.1.6\\sqlitepclraw.core.2.1.6.nupkg.sha512",
+    "C:\\Users\\gajip\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.6\\sqlitepclraw.lib.e_sqlite3.2.1.6.nupkg.sha512",
+    "C:\\Users\\gajip\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.1.6\\sqlitepclraw.provider.e_sqlite3.2.1.6.nupkg.sha512",
+    "C:\\Users\\gajip\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
   ],
   "logs": []
 }

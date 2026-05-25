@@ -35,6 +35,7 @@ builder.Services.AddSingleton<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSingleton<ICityLookupService, GeoNamesCityLookupService>();
 builder.Services.AddSingleton<ICountryLookupService, CsvCountryLookupService>();
+builder.Services.AddSingleton<AuthApi.Services.DuelService>();
 
 // ---- Auth ----
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
@@ -82,7 +83,7 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 100,
+                PermitLimit = 600,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0
             }));
@@ -131,7 +132,8 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:4200", "https://austrianms.at", "https://www.austrianms.at", "https://memora.austrianms.at")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowCredentials()
+            .SetPreflightMaxAge(TimeSpan.FromHours(1)); // browser caches OPTIONS for 1h — massively reduces preflight requests
     });
 });
 
@@ -141,11 +143,12 @@ var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
 
 Directory.CreateDirectory(uploadsPath);
 
+app.UseCors("frontend");          // must be first so ALL responses get CORS headers
+
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseRateLimiter();
 
 app.UseHttpsRedirection();
-app.UseCors("frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

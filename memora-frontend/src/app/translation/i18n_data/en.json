@@ -306,6 +306,22 @@
         "firstAlbum": "First album added",
         "comingSoon": "Coming soon"
     },
+    "duel": {
+        "challenged": "You've been challenged!",
+        "challengedBy": "{name} is challenging you to a Memory Duel.",
+        "accept": "Accept",
+        "decline": "Decline",
+        "challenge": "Challenge",
+        "online": "Online",
+        "youWon": "You won!",
+        "opponentWon": "Opponent won.",
+        "tie": "It's a tie!",
+        "you": "You",
+        "opponent": "Opponent",
+        "waitingOpponent": "Waiting for opponent...",
+        "declined": "{name} declined your challenge.",
+        "opponentQuit": "Your opponent left the game."
+    },
     "impressum": {
         "provider": "Provider",
         "representedBy": "Represented by",

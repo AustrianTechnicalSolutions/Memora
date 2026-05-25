@@ -1,0 +1,11 @@
+<div class="challenge-overlay">
+  <div class="challenge-card">
+    <div class="challenge-icon">⚔️</div>
+    <h2 class="challenge-title">{{ 'duel.challenged' | t }}</h2>
+    <p class="challenge-sub">{{ 'duel.challengedBy' | t: { name: challengerName } }}</p>
+    <div class="challenge-actions">
+      <button class="btn accept" (click)="accepted.emit()">{{ 'duel.accept' | t }}</button>
+      <button class="btn decline" (click)="declined.emit()">{{ 'duel.decline' | t }}</button>
+    </div>
+  </div>
+</div>

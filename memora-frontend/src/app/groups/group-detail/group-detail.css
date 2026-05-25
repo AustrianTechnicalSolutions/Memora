@@ -1,3 +1,27 @@
+/* ===== Declined toast ===== */
+.declined-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e1e2e;
+  color: #f9fafb;
+  border: 1px solid #ef4444;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 2000;
+  cursor: pointer;
+  animation: slideUp 0.25s ease;
+  white-space: nowrap;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 /* ===== Page ===== */
 .page {
   background: var(--bg-app);
@@ -302,6 +326,41 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Duel */
+.online-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  margin-left: 6px;
+  vertical-align: middle;
+  box-shadow: 0 0 0 2px rgba(34,197,94,0.3);
+}
+
+.btn-duel-challenge {
+  margin-top: 8px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.btn-duel-challenge:hover:not(:disabled) {
+  background: var(--hover-bg);
+  border-color: var(--accent-strong);
+}
+
+.btn-duel-challenge:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 /* Responsive */
