@@ -480,6 +480,12 @@ export class AlbumDetailComponent implements OnDestroy {
   }
 
   createMemory() {
+    // Resolve tagged user IDs to display names so the backend stores names, not UUIDs
+    const resolvedPeople = [
+      ...this.taggedUserIds.map(id => this.memberById[id]?.name ?? id),
+      ...this.freeTextPeople,
+    ];
+
     const baseData: any = {
       type: this.newType,
       title: this.newTitle || null,
@@ -487,7 +493,7 @@ export class AlbumDetailComponent implements OnDestroy {
       quoteBy: this.newType === 2 ? (this.newQuoteBy || null) : null,
       happenedAt: new Date(this.newDate).toISOString(),
       tags: [],
-      people: this.taggedUserIds,
+      people: resolvedPeople,
       albumId: this.albumId !== 'all' ? this.albumId : null,
 
       location: this.newLocationName ?? null,
@@ -525,6 +531,9 @@ export class AlbumDetailComponent implements OnDestroy {
     this.loadMemories();
     this.newQuoteBy = '';
     this.showMentionPopup = false;
+    this.taggedUserIds = [];
+    this.freeTextPeople = [];
+    this.mediaTagInput = '';
   }
 
   // Mentioning

@@ -317,4 +317,71 @@ export class GroupsService {
       `${this.baseUrl}/${groupId}/memories/${memoryId}`
     );
   }
+
+  // ── Duel ──────────────────────────────────────────────────────────────────
+
+  duelHeartbeat(groupId: string) {
+    return this.http.post<void>(`${this.baseUrl}/${groupId}/duel/heartbeat`, null);
+  }
+
+  duelOnline(groupId: string) {
+    return this.http.get<{ userId: string; name: string }[]>(
+      `${this.baseUrl}/${groupId}/duel/online`
+    );
+  }
+
+  duelChallenge(groupId: string, targetUserId: string, memoryIds: string[]) {
+    return this.http.post<{ duelId: string }>(
+      `${this.baseUrl}/${groupId}/duel/challenge`,
+      { targetUserId, memoryIds }
+    );
+  }
+
+  duelPending(groupId: string) {
+    return this.http.get<{ duelId: string; challengerName: string; memoryCount: number } | null>(
+      `${this.baseUrl}/${groupId}/duel/pending`
+    );
+  }
+
+  duelAccept(groupId: string, duelId: string) {
+    return this.http.post<{ memoryIds: string[] }>(
+      `${this.baseUrl}/${groupId}/duel/${duelId}/accept`, null
+    );
+  }
+
+  duelDecline(groupId: string, duelId: string) {
+    return this.http.post<void>(
+      `${this.baseUrl}/${groupId}/duel/${duelId}/decline`, null
+    );
+  }
+
+  duelAnswer(groupId: string, duelId: string, correct: boolean) {
+    return this.http.post<DuelStateDto>(
+      `${this.baseUrl}/${groupId}/duel/${duelId}/answer`, { correct }
+    );
+  }
+
+  duelQuit(groupId: string, duelId: string) {
+    return this.http.post<void>(
+      `${this.baseUrl}/${groupId}/duel/${duelId}/quit`, null
+    );
+  }
+
+  duelState(groupId: string, duelId: string) {
+    return this.http.get<DuelStateDto>(
+      `${this.baseUrl}/${groupId}/duel/${duelId}/state`
+    );
+  }
+}
+
+export interface DuelStateDto {
+  duelId: string;
+  status: 'active' | 'finished' | 'declined' | 'pending';
+  myScore: number;
+  opponentScore: number;
+  myAnswered: number;
+  opponentAnswered: number;
+  total: number;
+  memoryIds: string[];
+  opponentForfeited?: boolean;
 }

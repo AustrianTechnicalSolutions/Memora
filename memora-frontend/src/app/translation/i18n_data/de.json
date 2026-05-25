@@ -305,6 +305,22 @@
         "firstAlbum": "Erstes Album hinzugefügt",
         "comingSoon": "Kommt bald"
     },
+    "duel": {
+        "challenged": "Du wurdest herausgefordert!",
+        "challengedBy": "{name} fordert dich zum Memory-Duell heraus.",
+        "accept": "Annehmen",
+        "decline": "Ablehnen",
+        "challenge": "Herausfordern",
+        "online": "Online",
+        "youWon": "Du hast gewonnen!",
+        "opponentWon": "Gegner hat gewonnen.",
+        "tie": "Unentschieden!",
+        "you": "Du",
+        "opponent": "Gegner",
+        "waitingOpponent": "Warte auf Gegner...",
+        "declined": "{name} hat deine Herausforderung abgelehnt.",
+        "opponentQuit": "Dein Gegner hat das Spiel verlassen."
+    },
     "impressum": {
         "provider": "Anbieter",
         "representedBy": "Vertreten durch",
