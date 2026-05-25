@@ -8,11 +8,36 @@ body {
   padding: 0;
   min-height: 100%;
   font-family: Inter, sans-serif;
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--app-gradient);
 }
+
+/* ── Global page entry animation ───────────────────
+   Applies automatically to any .page root element.
+   Component-level overrides take precedence.        */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.page {
+  animation: pageEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger helper classes */
+.stagger-1  { animation-delay: 0.06s !important; }
+.stagger-2  { animation-delay: 0.12s !important; }
+.stagger-3  { animation-delay: 0.18s !important; }
+.stagger-4  { animation-delay: 0.24s !important; }
+.stagger-5  { animation-delay: 0.30s !important; }
 
 :root {
   --accent: #a855f7;
@@ -82,6 +107,15 @@ body {
   --stats-warm-2: #f2c94c;
   --stats-cool-1: #56ccf2;
   --stats-cool-2: #2f80ed;
+
+  --gold: #d4af37;
+  --gold-light: #f0d060;
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-border: rgba(212, 175, 55, 0.28);
+  --gold-glow: rgba(212, 175, 55, 0.2);
+
+  --accent-rgb: 168, 85, 247;
+  --accent-strong-rgb: 79, 70, 229;
 }
 
 html[data-theme='light'] {

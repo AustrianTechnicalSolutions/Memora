@@ -326,7 +326,8 @@
         "representedBy": "Vertreten durch",
         "contact": "Kontakt",
         "liability": "Haftungshinweis",
-        "liabilityText": "Trotz sorgfältiger Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links."
+        "liabilityText": "Trotz sorgfältiger Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links.",
+        "subtitle": "Informationen über das Team hinter Memora."
     },
     "admin": {
         "groupAdmin": "Gruppen-Admin",

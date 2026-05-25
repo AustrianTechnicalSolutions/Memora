@@ -327,7 +327,8 @@
         "representedBy": "Represented by",
         "contact": "Contact",
         "liability": "Liability notice",
-        "liabilityText": "Despite careful review, we assume no liability for the contents of external links."
+        "liabilityText": "Despite careful review, we assume no liability for the contents of external links.",
+        "subtitle": "Information about the team behind Memora."
     },
     "admin": {
         "groupAdmin": "Group Admin",

@@ -1,44 +1,52 @@
 <div class="page">
-  <header class="hero panel">
+
+  <!-- Hero -->
+  <header class="hero">
     <div class="hero-top">
       <div class="hero-text">
         <p class="eyebrow">Memora</p>
         <h1 class="title">{{ 'app.impressum' | t }}</h1>
       </div>
-      <button class="back-button" type="button" (click)="goBack()">{{ 'albums.back' | t }}</button>
+      <button class="back-button" type="button" (click)="goBack()">← {{ 'albums.back' | t }}</button>
     </div>
-    <p class="subtitle">
-      
-    </p>
+    <p class="subtitle">{{ 'impressum.subtitle' | t }}</p>
   </header>
 
+  <!-- Provider -->
   <section class="panel">
     <h2 class="panel-title">{{ 'impressum.provider' | t }}</h2>
     <div class="provider">
       <p>Memora Projektteam</p>
       <p>Spengergasse 5</p>
-      <p>Wien</p>
+      <p>1050 Wien</p>
       <p>Österreich</p>
     </div>
   </section>
 
+  <!-- Team -->
   <section class="panel">
     <h2 class="panel-title">{{ 'impressum.representedBy' | t }}</h2>
-    <ul class="team">
-      <li *ngFor="let member of teamMembers">{{ member }}</li>
-    </ul>
+    <div class="team-grid">
+      <div class="member-card" *ngFor="let member of teamMembers">
+        <div class="member-avatar">{{ member.charAt(0) }}</div>
+        <span class="member-name">{{ member }}</span>
+      </div>
+    </div>
   </section>
 
-  <section class="panel grid">
-    <article class="card">
-      <h3>{{ 'impressum.contact' | t }}</h3>
-      <p>E-Mail: kontakt@memora.example</p>
-      <p>Telefon: +49 30 12345678</p>
-    </article>
-
-    <article class="card">
-      <h3>{{ 'impressum.liability' | t }}</h3>
-      <p>{{ 'impressum.liabilityText' | t }}</p>
-    </article>
+  <!-- Contact & Liability -->
+  <section class="panel">
+    <div class="info-grid">
+      <article class="card">
+        <h3>{{ 'impressum.contact' | t }}</h3>
+        <p>E-Mail: kontakt@memora.example</p>
+        <p>Telefon: +43 1 59955</p>
+      </article>
+      <article class="card">
+        <h3>{{ 'impressum.liability' | t }}</h3>
+        <p>{{ 'impressum.liabilityText' | t }}</p>
+      </article>
+    </div>
   </section>
+
 </div>
