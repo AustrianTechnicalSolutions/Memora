@@ -20,11 +20,50 @@
         </div>
       </div>
 
-      <button class="btn primary hero-action" type="button" (click)="openAddMemory()">
-        {{ 'album.addMemory' | t }}
-      </button>
+      <div class="hero-actions">
+        <button
+          class="btn ghost hero-action random-btn"
+          type="button"
+          (click)="openRandomMemory()"
+          [disabled]="items.length === 0 || isPreparingRandomMemory"
+          [class.is-preparing]="isPreparingRandomMemory"
+          [attr.aria-busy]="isPreparingRandomMemory"
+        >
+          <span class="random-btn-icon" aria-hidden="true">✦</span>
+          <span>{{ isPreparingRandomMemory ? 'Preparing...' : 'Random memory' }}</span>
+        </button>
+
+        <button class="btn primary hero-action" type="button" (click)="openAddMemory()">
+          {{ 'album.addMemory' | t }}
+        </button>
+      </div>
     </div>
   </section>
+
+  <div class="modal-backdrop random-memory-backdrop" *ngIf="isPreparingRandomMemory">
+    <div class="random-memory-modal">
+      <div class="random-memory-orbit">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="random-memory-body">
+        <div class="random-memory-badge">✦</div>
+
+        <div class="random-memory-copy">
+          <h2>Preparing a random memory</h2>
+          <p>{{ randomMemoryStatus || 'Searching the album for something worth surfacing...' }}</p>
+
+          <div class="random-memory-loading" aria-hidden="true">
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <section class="album-people" *ngIf="albumId !== 'all'">
     <div class="people-header">
