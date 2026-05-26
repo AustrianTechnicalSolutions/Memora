@@ -1,3 +1,13 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .page {
   max-width: 1100px;
   margin: 0 auto;
@@ -6,6 +16,7 @@
   background: var(--bg-app);
   color: var(--text-primary);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  animation: fadeInUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .page-header {
@@ -30,8 +41,12 @@
   margin: 0;
   font-size: clamp(32px, 5vw, 52px);
   line-height: 1;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent) 110%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .page-header p,
@@ -51,9 +66,22 @@
   background: linear-gradient(135deg, var(--bg-surface), var(--bg-surface-alt));
   border: 1px solid var(--border);
   border-radius: 26px;
-  box-shadow: 0 20px 40px var(--shadow-strong);
+  box-shadow: 0 4px 24px var(--shadow-soft);
   padding: 22px 26px;
   margin-bottom: 18px;
+  animation: panelIn 0.45s ease both;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.panel:nth-child(1) { animation-delay: 0.06s; }
+.panel:nth-child(2) { animation-delay: 0.12s; }
+.panel:nth-child(3) { animation-delay: 0.18s; }
+.panel:nth-child(4) { animation-delay: 0.24s; }
+
+.panel:hover,
+.card:hover {
+  border-color: rgba(168, 85, 247, 0.22);
+  box-shadow: 0 8px 36px var(--shadow-soft);
 }
 
 .card {

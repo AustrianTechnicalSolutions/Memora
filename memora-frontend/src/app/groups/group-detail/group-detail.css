@@ -35,12 +35,17 @@
   padding: 48px 32px;
   background: linear-gradient(135deg, var(--bg-surface-alt), var(--bg-surface));
   border-bottom: 1px solid var(--border);
+  animation: coverSlide 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .group-title {
   font-size: 42px;
   font-weight: 900;
   margin: 0;
+  background: linear-gradient(135deg, var(--text-primary) 50%, var(--accent) 120%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .cover-meta {
@@ -61,6 +66,7 @@
   grid-template-columns: 2fr 1fr;
   gap: 28px;
   padding: 28px 32px;
+  animation: layoutFade 0.48s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 }
 
 .main {

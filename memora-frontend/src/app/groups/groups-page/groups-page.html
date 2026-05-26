@@ -49,7 +49,7 @@
     <div class="loading" *ngIf="loading">{{ 'groups.loading' | t }}</div>
 
     <div class="grid" *ngIf="!loading">
-      <a class="group-card" *ngFor="let g of filteredGroups" [routerLink]="['/groups', g.id]">
+      <a class="group-card" *ngFor="let g of filteredGroups" [routerLink]="['/groups', g.id]" [attr.data-initial]="g.name.charAt(0).toUpperCase()">
         <div class="group-top">
           <div class="group-name">{{ g.name }}</div>
           <div class="arrow">→</div>
