@@ -20,11 +20,58 @@
         </div>
       </div>
 
-      <button class="btn primary hero-action" type="button" (click)="openAddMemory()">
-        {{ 'album.addMemory' | t }}
-      </button>
+      <div class="hero-actions">
+        <button
+          class="btn ghost hero-action random-btn"
+          type="button"
+          (click)="openRandomMemory()"
+          [disabled]="items.length === 0 || isPreparingRandomMemory"
+          [class.is-preparing]="isPreparingRandomMemory"
+          [attr.aria-busy]="isPreparingRandomMemory"
+        >
+          <span class="random-btn-icon" aria-hidden="true">✦</span>
+          <span>{{ isPreparingRandomMemory ? 'Preparing...' : 'Random memory' }}</span>
+        </button>
+
+        <button
+          class="btn ghost hero-action"
+          type="button"
+          (click)="openFilterModal()"
+        >
+          🔎 Filter
+        </button>
+
+        <button class="btn primary hero-action" type="button" (click)="openAddMemory()">
+          {{ 'album.addMemory' | t }}
+        </button>
+      </div>
     </div>
   </section>
+
+  <div class="modal-backdrop random-memory-backdrop" *ngIf="isPreparingRandomMemory">
+    <div class="random-memory-modal">
+      <div class="random-memory-orbit">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="random-memory-body">
+        <div class="random-memory-badge">✦</div>
+
+        <div class="random-memory-copy">
+          <h2>Preparing a random memory</h2>
+          <p>{{ randomMemoryStatus || 'Searching the album for something worth surfacing...' }}</p>
+
+          <div class="random-memory-loading" aria-hidden="true">
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <section class="album-people" *ngIf="albumId !== 'all'">
     <div class="people-header">
@@ -361,6 +408,52 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" *ngIf="showFilterModal" (click)="closeFilterModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" (click)="closeFilterModal()">&times;</button>
+      <h2>Filter memories</h2>
+
+      <div class="modal-body">
+        <div class="field">
+          <label>User</label>
+          <select class="input" [(ngModel)]="filterCriteria.userId">
+            <option [ngValue]="null">Any</option>
+            <option *ngFor="let m of members" [ngValue]="m.userId">{{ m.name }} ({{ m.role }})</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Date from</label>
+          <input type="date" class="input" [(ngModel)]="filterCriteria.dateFrom" />
+        </div>
+
+        <div class="field">
+          <label>Date to</label>
+          <input type="date" class="input" [(ngModel)]="filterCriteria.dateTo" />
+        </div>
+
+        <div class="field">
+          <label>Type</label>
+          <select class="input" [(ngModel)]="filterCriteria.mediaType">
+            <option value="any">Any</option>
+            <option value="photo">Photo</option>
+            <option value="video">Video</option>
+            <option value="quote">Quote</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label><input type="checkbox" [(ngModel)]="filterCriteria.hasLocation" /> Only with location</label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn ghost" type="button" (click)="clearFilter()">Clear</button>
+        <button class="btn primary" type="button" (click)="applyFilter()">Apply</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" *ngIf="showAddMemoryModal">
     <div class="modal" [class.media-mode]="addStep === 'media'" [class.draw-mode]="addStep === 'draw'">
       <button class="modal-close" type="button" (click)="showAddMemoryModal = false">&times;</button>
@@ -526,7 +619,7 @@
       <div *ngIf="addStep === 'quote'" class="modal-body">
         <div class="form">
           <div class="field">
-            <label>{{ 'album.quoteText' | t }}</label>
+              <label>{{ 'album.quoteText' | t }}</label>
             <textarea
               class="input textarea"
               [placeholder]="'album.quotePlaceholder' | t"
