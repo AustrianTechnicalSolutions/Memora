@@ -48,31 +48,6 @@
     </div>
   </section>
 
-  <div class="modal-backdrop random-memory-backdrop" *ngIf="isPreparingRandomMemory">
-    <div class="random-memory-modal">
-      <div class="random-memory-orbit">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <div class="random-memory-body">
-        <div class="random-memory-badge">✦</div>
-
-        <div class="random-memory-copy">
-          <h2>Preparing a random memory</h2>
-          <p>{{ randomMemoryStatus || 'Searching the album for something worth surfacing...' }}</p>
-
-          <div class="random-memory-loading" aria-hidden="true">
-            <span>.</span>
-            <span>.</span>
-            <span>.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <section class="album-people" *ngIf="albumId !== 'all'">
     <div class="people-header">
       <h3>{{ 'album.people' | t }}</h3>
@@ -230,412 +205,392 @@
       </div>
     </ng-template>
   </section>
+</div>
 
-  <div class="modal-backdrop" *ngIf="showMemoryModal && activeMemory as m" (click)="closeMemory()">
-    <div class="memory-modal" (click)="$event.stopPropagation()">
-      <button class="modal-close" type="button" (click)="closeMemory()">&times;</button>
+<!-- ── Modals outside .page so position:fixed works relative to viewport ── -->
 
-      <div class="memory-layout">
-        <div class="memory-media">
-          <ng-container *ngIf="m.type !== 2">
-            <img
-              *ngIf="m.type === 0 && !mediaFailed(m.mediaUrl)"
-              [src]="imageSrcMap.get(m.mediaUrl!)"
-              [alt]="m.title || 'Memory image'"
-              (error)="onMediaError(m.mediaUrl)"
-            />
+<div class="modal-backdrop random-memory-backdrop" *ngIf="isPreparingRandomMemory">
+  <div class="random-memory-modal">
+    <div class="random-memory-orbit">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
 
-            <video
-              *ngIf="m.type === 1 && !mediaFailed(m.mediaUrl)"
-              controls
-              [src]="imageSrcMap.get(m.mediaUrl!)"
-              (error)="onMediaError(m.mediaUrl)"
-            ></video>
+    <div class="random-memory-body">
+      <div class="random-memory-badge">✦</div>
 
-            <div *ngIf="m.type === 0 && mediaFailed(m.mediaUrl)" class="media-error">{{ 'album.imageLoadError' | t }}</div>
-            <div *ngIf="m.type === 1 && mediaFailed(m.mediaUrl)" class="media-error">{{ 'album.videoLoadError' | t }}</div>
+      <div class="random-memory-copy">
+        <h2>Preparing a random memory</h2>
+        <p>{{ randomMemoryStatus || 'Searching the album for something worth surfacing...' }}</p>
+
+        <div class="random-memory-loading" aria-hidden="true">
+          <span>.</span>
+          <span>.</span>
+          <span>.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showMemoryModal && activeMemory as m" (click)="closeMemory()">
+  <div class="memory-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" type="button" (click)="closeMemory()">&times;</button>
+
+    <div class="memory-layout">
+      <div class="memory-media">
+        <ng-container *ngIf="m.type !== 2">
+          <img
+            *ngIf="m.type === 0 && !mediaFailed(m.mediaUrl)"
+            [src]="imageSrcMap.get(m.mediaUrl!)"
+            [alt]="m.title || 'Memory image'"
+            (error)="onMediaError(m.mediaUrl)"
+          />
+
+          <video
+            *ngIf="m.type === 1 && !mediaFailed(m.mediaUrl)"
+            controls
+            [src]="imageSrcMap.get(m.mediaUrl!)"
+            (error)="onMediaError(m.mediaUrl)"
+          ></video>
+
+          <div *ngIf="m.type === 0 && mediaFailed(m.mediaUrl)" class="media-error">{{ 'album.imageLoadError' | t }}</div>
+          <div *ngIf="m.type === 1 && mediaFailed(m.mediaUrl)" class="media-error">{{ 'album.videoLoadError' | t }}</div>
+        </ng-container>
+
+        <div class="quote-full" *ngIf="m.type === 2">
+          <div class="quote-text">
+          &ldquo;{{ m.quoteText }}&rdquo;
+        </div>
+
+        <div class="quote-by" *ngIf="m.quoteBy">
+          &mdash; {{ m.quoteBy }}
+        </div>
+        </div>
+      </div>
+
+      <aside class="memory-comments">
+        <div class="memory-header">
+          <div class="memory-meta">
+            <div class="memory-title" *ngIf="m.title"> {{ m.title }} </div>
+
+            <div class="memory-date">{{ m.happenedAt | date:'dd/MM/yyyy' }}</div>
+            <div class="memory-location" *ngIf="m.locationName || m.locationCity || m.locationCountry || m.latitude">
+              📍
+              <span *ngIf="m.locationName">{{ m.locationName }}</span>
+
+              <span *ngIf="m.locationName && (m.locationCity || m.locationCountry)"> · </span>
+
+              <span *ngIf="m.locationCity || m.locationCountry">
+                {{ m.locationCity }}<span *ngIf="m.locationCity && m.locationCountry">, </span>{{ m.locationCountry }}
+              </span>
+
+              <span *ngIf="!m.locationName && !m.locationCity && !m.locationCountry">
+                {{ m.latitude }}, {{ m.longitude }}
+              </span>
+            </div>
+
+            <div class="memory-location muted" *ngIf="!m.locationName && !m.locationCity && !m.locationCountry && !m.latitude">
+              No location provided.
+            </div>
+
+            <div class="memory-uploader" *ngIf="activeUploader as uploader">
+              <div class="uploader-avatar">
+                <img *ngIf="uploader.avatarUrl; else uploaderInitial" [src]="uploader.avatarUrl" />
+                <ng-template #uploaderInitial>{{ uploader.name.charAt(0) }}</ng-template>
+              </div>
+              <div class="uploader-text">
+                <div class="uploader-label">{{ 'album.uploadedBy' | t }}</div>
+                <div class="uploader-name">{{ uploader.name }}</div>
+              </div>
+            </div>
+
+            <div class="memory-tagged" *ngIf="getTaggedUsers(m).length">
+              <div class="tagged-label">👥 With</div>
+
+              <div class="tagged-list">
+                <div class="tagged-user" *ngFor="let u of getTaggedUsers(m)">
+                  <img *ngIf="u.avatarUrl; else initials" [src]="u.avatarUrl" />
+
+                  <ng-template #initials>
+                    <div class="avatar">{{ u.name.charAt(0) }}</div>
+                  </ng-template>
+
+                  <span>{{ u.name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="memory-actions">
+            <button class="icon-btn" type="button" (click)="toggleMemoryLike(m, $event)">
+              <span class="icon" [class.active]="m.isLiked">&#x2665;</span>
+              <span>{{ m.likeCount || 0 }}</span>
+            </button>
+            <div class="comment-count">&#x1F4AC; {{ m.commentCount || 0 }}</div>
+          </div>
+        </div>
+
+        <div class="comment-list">
+          <div class="comment muted" *ngIf="commentsLoading">{{ 'album.commentsLoading' | t }}</div>
+
+          <div class="comment muted" *ngIf="!commentsLoading && topLevelComments.length === 0">
+            {{ 'album.noComments' | t }}
+          </div>
+
+          <div class="comment" *ngFor="let c of topLevelComments">
+            <div class="comment-avatar">
+              <img *ngIf="c.avatarUrl" [src]="c.avatarUrl" />
+              <div *ngIf="!c.avatarUrl">{{ c.userName.charAt(0) }}</div>
+            </div>
+
+            <div class="comment-body">
+              <div class="comment-meta">
+                <strong>{{ c.userName }}</strong>
+                <span class="muted">{{ c.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="comment-text">{{ c.content }}</div>
+
+              <div class="comment-actions">
+                <button class="link-btn" type="button" (click)="toggleCommentLike(c, $event)">
+                  <span class="icon" [class.active]="c.isLiked">&#x2665;</span>
+                  <span>{{ c.likeCount || 0 }}</span>
+                </button>
+                <button class="link-btn" type="button" (click)="setReply(c)">{{ 'album.reply' | t }}</button>
+              </div>
+
+              <div class="comment-replies" *ngIf="replyMap[c.id]?.length">
+                <div class="comment reply" *ngFor="let r of replyMap[c.id]">
+                  <div class="comment-avatar">
+                    <img *ngIf="r.avatarUrl" [src]="r.avatarUrl" />
+                    <div *ngIf="!r.avatarUrl">{{ r.userName.charAt(0) }}</div>
+                  </div>
+                  <div class="comment-body">
+                    <div class="comment-meta">
+                      <strong>{{ r.userName }}</strong>
+                      <span class="muted">{{ r.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <div class="comment-text">{{ r.content }}</div>
+                    <div class="comment-actions">
+                      <button class="link-btn" type="button" (click)="toggleCommentLike(r, $event)">
+                        <span class="icon" [class.active]="r.isLiked">&#x2665;</span>
+                        <span>{{ r.likeCount || 0 }}</span>
+                      </button>
+                      <button class="link-btn" type="button" (click)="setReply(r)">{{ 'album.reply' | t }}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comment-editor">
+          <div class="replying" *ngIf="replyTo">
+            {{ 'album.replyingTo' | t:{ name: replyTo.userName } }}
+            <button class="link-btn" type="button" (click)="cancelReply()">{{ 'album.cancel' | t }}</button>
+          </div>
+          <textarea
+            class="input textarea"
+            [(ngModel)]="commentText"
+            [placeholder]="'album.writeComment' | t"
+          ></textarea>
+          <div class="comment-submit">
+            <button
+              *ngIf="canRemoveMemory(m)"
+              class="icon-btn danger"
+              type="button"
+              (click)="removeMemory(m, $event)">
+              🗑 Remove
+            </button>
+            <button class="btn primary" type="button" (click)="submitComment()">{{ 'album.send' | t }}</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showFilterModal" (click)="closeFilterModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" type="button" (click)="closeFilterModal()">&times;</button>
+    <h2>Filter memories</h2>
+
+    <div class="modal-body">
+      <div class="field">
+        <label>User</label>
+        <select class="input" [(ngModel)]="filterCriteria.userId">
+          <option [ngValue]="null">Any</option>
+          <option *ngFor="let m of members" [ngValue]="m.userId">{{ m.name }} ({{ m.role }})</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Date from</label>
+        <input type="date" class="input" [(ngModel)]="filterCriteria.dateFrom" />
+      </div>
+
+      <div class="field">
+        <label>Date to</label>
+        <input type="date" class="input" [(ngModel)]="filterCriteria.dateTo" />
+      </div>
+
+      <div class="field">
+        <label>Type</label>
+        <select class="input" [(ngModel)]="filterCriteria.mediaType">
+          <option value="any">Any</option>
+          <option value="photo">Photo</option>
+          <option value="video">Video</option>
+          <option value="quote">Quote</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><input type="checkbox" [(ngModel)]="filterCriteria.hasLocation" /> Only with location</label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn ghost" type="button" (click)="clearFilter()">Clear</button>
+      <button class="btn primary" type="button" (click)="applyFilter()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showAddMemoryModal">
+  <div class="modal" [class.media-mode]="addStep === 'media'" [class.draw-mode]="addStep === 'draw'">
+    <button class="modal-close" type="button" (click)="showAddMemoryModal = false">&times;</button>
+
+    <h2>{{ 'album.addMemory' | t }}</h2>
+
+    <!-- Choose -->
+    <div *ngIf="addStep === 'choose'" class="choice-grid">
+      <div class="choice-card" (click)="addStep='media'; mediaType='photo'">
+        <div class="icon">&#x1F5BC;</div>
+        <div class="title">{{ 'album.uploadPhoto' | t }}</div>
+      </div>
+
+      <div class="choice-card" (click)="addStep='media'; mediaType='video'">
+        <div class="icon">&#x1F3A5;</div>
+        <div class="title">{{ 'album.uploadVideo' | t }}</div>
+      </div>
+
+      <div class="choice-card" (click)="addStep='quote'">
+        <div class="icon">&#x275D;</div>
+        <div class="title">{{ 'album.addQuote' | t }}</div>
+      </div>
+
+      <div class="choice-card" (click)="addStep='draw'">
+        <div class="icon">🎨</div>
+        <div class="title">{{ 'album.draw' | t }}</div>
+      </div>
+    </div>
+
+    <!-- Media -->
+    <div *ngIf="addStep === 'media'" class="modal-body media-layout">
+      <!-- LEFT -->
+      <div class="media-left">
+        <label class="upload-box" [class.has-preview]="previewUrl">
+          <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+
+          <!-- No file -> show upload UI -->
+          <ng-container *ngIf="!previewUrl; else previewBlock">
+            <div class="upload-icon">&#x2B06;</div>
+            <div class="upload-title">
+              Click to upload {{ mediaType }}
+            </div>
+            <div class="hint">
+              {{ mediaType === 'photo' ? ('album.uploadHintPhoto' | t) : ('album.uploadHintVideo' | t) }}
+            </div>
+            <div class="hint subtle">
+              Some details like the location may be auto-filled from file metadata. You can turn this off in your settings.
+            </div>
           </ng-container>
 
-          <div class="quote-full" *ngIf="m.type === 2">
-            <div class="quote-text">
-            &ldquo;{{ m.quoteText }}&rdquo;
-          </div>
+          <!-- File exists -> show preview -->
+          <ng-template #previewBlock>
+            <ng-container *ngIf="previewUrl">
+              <img
+                *ngIf="mediaType === 'photo'"
+                class="media-preview"
+                [src]="previewUrl"
+              />
 
-          <div class="quote-by" *ngIf="m.quoteBy">
-            &mdash; {{ m.quoteBy }}
-          </div>
-          </div>
-        </div>
-
-        <aside class="memory-comments">
-          <div class="memory-header">
-            <div class="memory-meta">
-              <div class="memory-title" *ngIf="m.title"> {{ m.title }} </div>
-
-              <div class="memory-date">{{ m.happenedAt | date:'dd/MM/yyyy' }}</div>
-              <div class="memory-location" *ngIf="m.locationName || m.locationCity || m.locationCountry || m.latitude">
-                📍
-                <span *ngIf="m.locationName">{{ m.locationName }}</span>
-
-                <span *ngIf="m.locationName && (m.locationCity || m.locationCountry)"> · </span>
-
-                <span *ngIf="m.locationCity || m.locationCountry">
-                  {{ m.locationCity }}<span *ngIf="m.locationCity && m.locationCountry">, </span>{{ m.locationCountry }}
-                </span>
-
-                <span *ngIf="!m.locationName && !m.locationCity && !m.locationCountry">
-                  {{ m.latitude }}, {{ m.longitude }}
-                </span>
-              </div>
-
-              <div class="memory-location muted" *ngIf="!m.locationName && !m.locationCity && !m.locationCountry && !m.latitude">
-                No location provided.
-              </div>
-
-              <div class="memory-uploader" *ngIf="activeUploader as uploader">
-                <div class="uploader-avatar">
-                  <img *ngIf="uploader.avatarUrl; else uploaderInitial" [src]="uploader.avatarUrl" />
-                  <ng-template #uploaderInitial>{{ uploader.name.charAt(0) }}</ng-template>
-                </div>
-                <div class="uploader-text">
-                  <div class="uploader-label">{{ 'album.uploadedBy' | t }}</div>
-                  <div class="uploader-name">{{ uploader.name }}</div>
-                </div>
-              </div>
-
-              <div class="memory-tagged" *ngIf="getTaggedUsers(m).length">
-                <div class="tagged-label">👥 With</div>
-
-                <div class="tagged-list">
-                  <div class="tagged-user" *ngFor="let u of getTaggedUsers(m)">
-                    <img *ngIf="u.avatarUrl; else initials" [src]="u.avatarUrl" />
-                    
-                    <ng-template #initials>
-                      <div class="avatar">{{ u.name.charAt(0) }}</div>
-                    </ng-template>
-
-                    <span>{{ u.name }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="memory-actions">
-              <button class="icon-btn" type="button" (click)="toggleMemoryLike(m, $event)">
-                <span class="icon" [class.active]="m.isLiked">&#x2665;</span>
-                <span>{{ m.likeCount || 0 }}</span>
-              </button>
-              <div class="comment-count">&#x1F4AC; {{ m.commentCount || 0 }}</div>
-            </div>
-          </div>
-
-          <div class="comment-list">
-            <div class="comment muted" *ngIf="commentsLoading">{{ 'album.commentsLoading' | t }}</div>
-
-            <div class="comment muted" *ngIf="!commentsLoading && topLevelComments.length === 0">
-              {{ 'album.noComments' | t }}
-            </div>
-
-            <div class="comment" *ngFor="let c of topLevelComments">
-              <div class="comment-avatar">
-                <img *ngIf="c.avatarUrl" [src]="c.avatarUrl" />
-                <div *ngIf="!c.avatarUrl">{{ c.userName.charAt(0) }}</div>
-              </div>
-
-              <div class="comment-body">
-                <div class="comment-meta">
-                  <strong>{{ c.userName }}</strong>
-                  <span class="muted">{{ c.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-                </div>
-                <div class="comment-text">{{ c.content }}</div>
-
-                <div class="comment-actions">
-                  <button class="link-btn" type="button" (click)="toggleCommentLike(c, $event)">
-                    <span class="icon" [class.active]="c.isLiked">&#x2665;</span>
-                    <span>{{ c.likeCount || 0 }}</span>
-                  </button>
-                  <button class="link-btn" type="button" (click)="setReply(c)">{{ 'album.reply' | t }}</button>
-                </div>
-
-                <div class="comment-replies" *ngIf="replyMap[c.id]?.length">
-                  <div class="comment reply" *ngFor="let r of replyMap[c.id]">
-                    <div class="comment-avatar">
-                      <img *ngIf="r.avatarUrl" [src]="r.avatarUrl" />
-                      <div *ngIf="!r.avatarUrl">{{ r.userName.charAt(0) }}</div>
-                    </div>
-                    <div class="comment-body">
-                      <div class="comment-meta">
-                        <strong>{{ r.userName }}</strong>
-                        <span class="muted">{{ r.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-                      </div>
-                      <div class="comment-text">{{ r.content }}</div>
-                      <div class="comment-actions">
-                        <button class="link-btn" type="button" (click)="toggleCommentLike(r, $event)">
-                          <span class="icon" [class.active]="r.isLiked">&#x2665;</span>
-                          <span>{{ r.likeCount || 0 }}</span>
-                        </button>
-                        <button class="link-btn" type="button" (click)="setReply(r)">{{ 'album.reply' | t }}</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="comment-editor">
-            <div class="replying" *ngIf="replyTo">
-              {{ 'album.replyingTo' | t:{ name: replyTo.userName } }}
-              <button class="link-btn" type="button" (click)="cancelReply()">{{ 'album.cancel' | t }}</button>
-            </div>
-            <textarea
-              class="input textarea"
-              [(ngModel)]="commentText"
-              [placeholder]="'album.writeComment' | t"
-            ></textarea>
-            <div class="comment-submit">
-              <button
-                *ngIf="canRemoveMemory(m)"
-                class="icon-btn danger"
-                type="button"
-                (click)="removeMemory(m, $event)">
-                🗑 Remove
-              </button>
-              <button class="btn primary" type="button" (click)="submitComment()">{{ 'album.send' | t }}</button>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" *ngIf="showFilterModal" (click)="closeFilterModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <button class="modal-close" type="button" (click)="closeFilterModal()">&times;</button>
-      <h2>Filter memories</h2>
-
-      <div class="modal-body">
-        <div class="field">
-          <label>User</label>
-          <select class="input" [(ngModel)]="filterCriteria.userId">
-            <option [ngValue]="null">Any</option>
-            <option *ngFor="let m of members" [ngValue]="m.userId">{{ m.name }} ({{ m.role }})</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Date from</label>
-          <input type="date" class="input" [(ngModel)]="filterCriteria.dateFrom" />
-        </div>
-
-        <div class="field">
-          <label>Date to</label>
-          <input type="date" class="input" [(ngModel)]="filterCriteria.dateTo" />
-        </div>
-
-        <div class="field">
-          <label>Type</label>
-          <select class="input" [(ngModel)]="filterCriteria.mediaType">
-            <option value="any">Any</option>
-            <option value="photo">Photo</option>
-            <option value="video">Video</option>
-            <option value="quote">Quote</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label><input type="checkbox" [(ngModel)]="filterCriteria.hasLocation" /> Only with location</label>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn ghost" type="button" (click)="clearFilter()">Clear</button>
-        <button class="btn primary" type="button" (click)="applyFilter()">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" *ngIf="showAddMemoryModal">
-    <div class="modal" [class.media-mode]="addStep === 'media'" [class.draw-mode]="addStep === 'draw'">
-      <button class="modal-close" type="button" (click)="showAddMemoryModal = false">&times;</button>
-
-      <h2>{{ 'album.addMemory' | t }}</h2>
-
-      <!-- Choose -->
-      <div *ngIf="addStep === 'choose'" class="choice-grid">
-        <div class="choice-card" (click)="addStep='media'; mediaType='photo'">
-          <div class="icon">&#x1F5BC;</div>
-          <div class="title">{{ 'album.uploadPhoto' | t }}</div>
-        </div>
-
-        <div class="choice-card" (click)="addStep='media'; mediaType='video'">
-          <div class="icon">&#x1F3A5;</div>
-          <div class="title">{{ 'album.uploadVideo' | t }}</div>
-        </div>
-
-        <div class="choice-card" (click)="addStep='quote'">
-          <div class="icon">&#x275D;</div>
-          <div class="title">{{ 'album.addQuote' | t }}</div>
-        </div>
-
-        <div class="choice-card" (click)="addStep='draw'">
-          <div class="icon">🎨</div>
-          <div class="title">{{ 'album.draw' | t }}</div>
-        </div>
-      </div>
-
-      <!-- Media -->
-      <div *ngIf="addStep === 'media'" class="modal-body media-layout">
-        <!-- LEFT -->
-        <div class="media-left">
-          <label class="upload-box" [class.has-preview]="previewUrl">
-            <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
-
-            <!-- No file -> show upload UI -->
-            <ng-container *ngIf="!previewUrl; else previewBlock">
-              <div class="upload-icon">&#x2B06;</div>
-              <div class="upload-title">
-                Click to upload {{ mediaType }}
-              </div>
-              <div class="hint">
-                {{ mediaType === 'photo' ? ('album.uploadHintPhoto' | t) : ('album.uploadHintVideo' | t) }}
-              </div>
-              <div class="hint subtle">
-                Some details like the location may be auto-filled from file metadata. You can turn this off in your settings.
-              </div>
+              <video
+                *ngIf="mediaType === 'video'"
+                class="media-preview"
+                [src]="previewUrl"
+                controls
+              ></video>
             </ng-container>
-
-            <!-- File exists -> show preview -->
-            <ng-template #previewBlock>
-              <ng-container *ngIf="previewUrl">
-                <img
-                  *ngIf="mediaType === 'photo'"
-                  class="media-preview"
-                  [src]="previewUrl"
-                />
-
-                <video
-                  *ngIf="mediaType === 'video'"
-                  class="media-preview"
-                  [src]="previewUrl"
-                  controls
-                ></video>
-              </ng-container>
-            </ng-template>
-          </label>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="media-right">
-          <div class="form">
-            <div class="field">
-              <label>Name</label>
-              <input
-                class="input"
-                [(ngModel)]="newTitle"
-                placeholder="What's happening here?"
-              />
-            </div>
-
-            <div class="field">
-              <label>{{ 'album.date' | t }}</label>
-              <input type="date" class="input" [(ngModel)]="newDate" />
-            </div>
-
-            <div class="field">
-              <label>📍 Location</label>
-              <input
-                class="input"
-                [(ngModel)]="newLocationName"
-                placeholder="City, place, or memory location"
-              />
-            </div>
-
-            <div class="field" *ngIf="autoLat && autoLong">
-              <label>🌍 GPS</label>
-
-              <div class="gps-box">
-                <div>Lat: {{ autoLat }}</div>
-                <div>Long: {{ autoLong }}</div>
-
-                <button
-                  type="button"
-                  class="btn ghost small"
-                  (click)="useGps = !useGps">
-                  {{ useGps ? "Using GPS ✓" : "Not using GPS location" }}
-                </button>
-              </div>
-              <div class="hint subtle">
-                Some details like the picture coordinates may be auto-filled from file metadata. You can turn this off in your settings.
-              </div>
-            </div>
-
-            <div class="field">
-              <label>👥 People</label>
-
-              <!-- selected -->
-              <div class="tag-list" *ngIf="taggedUserIds.length">
-                <div class="tag" *ngFor="let id of taggedUserIds">
-                  {{ memberById[id]?.name }}
-                  <button type="button" (click)="removeTaggedUser(id)">×</button>
-                </div>
-              </div>
-
-              <!-- input -->
-              <div class="mention-wrap">
-                <input
-                  class="input"
-                  [(ngModel)]="mediaTagInput"
-                  placeholder="Type @ to tag people"
-                  (input)="onMediaTagInput()"
-                  (keydown)="onMediaTagKeydown($event)"
-                  (blur)="closeMentionPopup()"
-                />
-
-                <div class="mention-popup" *ngIf="showMentionPopup">
-                  <div
-                    class="mention-item"
-                    *ngFor="let u of mentionResults; let i = index"
-                    [class.active]="i === mentionIndex"
-                    (mousedown)="selectMediaTag(u)"
-                  >
-                    @{{ u.name }}
-                    <span class="muted">({{ u.role }})</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-actions">
-          <button class="btn ghost" (click)="addStep='choose'">{{ 'album.back' | t }}</button>
-          <button class="btn primary" (click)="submitMedia()">
-            {{ mediaType === 'photo' ? ('album.addPhoto' | t) : ('album.addVideo' | t) }}
-          </button>
-        </div>
+          </ng-template>
+        </label>
       </div>
 
-      <!-- Quote -->
-      <div *ngIf="addStep === 'quote'" class="modal-body">
+      <!-- RIGHT -->
+      <div class="media-right">
         <div class="form">
           <div class="field">
-              <label>{{ 'album.quoteText' | t }}</label>
-            <textarea
-              class="input textarea"
-              [placeholder]="'album.quotePlaceholder' | t"
-              [(ngModel)]="newQuoteText"
-            ></textarea>
+            <label>Name</label>
+            <input
+              class="input"
+              [(ngModel)]="newTitle"
+              placeholder="What's happening here?"
+            />
           </div>
 
           <div class="field">
-            <label>{{ 'album.quoteBy' | t }}</label>
+            <label>{{ 'album.date' | t }}</label>
+            <input type="date" class="input" [(ngModel)]="newDate" />
+          </div>
+
+          <div class="field">
+            <label>📍 Location</label>
+            <input
+              class="input"
+              [(ngModel)]="newLocationName"
+              placeholder="City, place, or memory location"
+            />
+          </div>
+
+          <div class="field" *ngIf="autoLat && autoLong">
+            <label>🌍 GPS</label>
+
+            <div class="gps-box">
+              <div>Lat: {{ autoLat }}</div>
+              <div>Long: {{ autoLong }}</div>
+
+              <button
+                type="button"
+                class="btn ghost small"
+                (click)="useGps = !useGps">
+                {{ useGps ? "Using GPS ✓" : "Not using GPS location" }}
+              </button>
+            </div>
+            <div class="hint subtle">
+              Some details like the picture coordinates may be auto-filled from file metadata. You can turn this off in your settings.
+            </div>
+          </div>
+
+          <div class="field">
+            <label>👥 People</label>
+
+            <!-- selected -->
+            <div class="tag-list" *ngIf="taggedUserIds.length">
+              <div class="tag" *ngFor="let id of taggedUserIds">
+                {{ memberById[id]?.name }}
+                <button type="button" (click)="removeTaggedUser(id)">×</button>
+              </div>
+            </div>
+
+            <!-- input -->
             <div class="mention-wrap">
               <input
                 class="input"
-                [(ngModel)]="newQuoteBy"
-                [placeholder]="'album.quoteByPlaceholder' | t"
-                (input)="onQuoteByInput()"
-                (keydown)="onQuoteByKeydown($event)"
+                [(ngModel)]="mediaTagInput"
+                placeholder="Type @ to tag people"
+                (input)="onMediaTagInput()"
+                (keydown)="onMediaTagKeydown($event)"
                 (blur)="closeMentionPopup()"
               />
 
@@ -644,7 +599,7 @@
                   class="mention-item"
                   *ngFor="let u of mentionResults; let i = index"
                   [class.active]="i === mentionIndex"
-                  (mousedown)="selectMention(u)"
+                  (mousedown)="selectMediaTag(u)"
                 >
                   @{{ u.name }}
                   <span class="muted">({{ u.role }})</span>
@@ -652,61 +607,108 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="field">
-            <label>{{ 'album.date' | t }}</label>
-            <input type="date" class="input" [(ngModel)]="newDate" />
+      <div class="modal-actions">
+        <button class="btn ghost" (click)="addStep='choose'">{{ 'album.back' | t }}</button>
+        <button class="btn primary" (click)="submitMedia()">
+          {{ mediaType === 'photo' ? ('album.addPhoto' | t) : ('album.addVideo' | t) }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Quote -->
+    <div *ngIf="addStep === 'quote'" class="modal-body">
+      <div class="form">
+        <div class="field">
+            <label>{{ 'album.quoteText' | t }}</label>
+          <textarea
+            class="input textarea"
+            [placeholder]="'album.quotePlaceholder' | t"
+            [(ngModel)]="newQuoteText"
+          ></textarea>
+        </div>
+
+        <div class="field">
+          <label>{{ 'album.quoteBy' | t }}</label>
+          <div class="mention-wrap">
+            <input
+              class="input"
+              [(ngModel)]="newQuoteBy"
+              [placeholder]="'album.quoteByPlaceholder' | t"
+              (input)="onQuoteByInput()"
+              (keydown)="onQuoteByKeydown($event)"
+              (blur)="closeMentionPopup()"
+            />
+
+            <div class="mention-popup" *ngIf="showMentionPopup">
+              <div
+                class="mention-item"
+                *ngFor="let u of mentionResults; let i = index"
+                [class.active]="i === mentionIndex"
+                (mousedown)="selectMention(u)"
+              >
+                @{{ u.name }}
+                <span class="muted">({{ u.role }})</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="modal-actions">
-          <button class="btn ghost" (click)="addStep='choose'">{{ 'album.back' | t }}</button>
-          <button class="btn primary" (click)="submitQuote()">{{ 'album.addQuote' | t }}</button>
+        <div class="field">
+          <label>{{ 'album.date' | t }}</label>
+          <input type="date" class="input" [(ngModel)]="newDate" />
         </div>
       </div>
 
-      <!-- Draw -->
-      <div *ngIf="addStep === 'draw'" class="draw-step">
-        <div class="draw-step-header">
-          <button class="btn ghost small" type="button" (click)="addStep='choose'">← {{ 'album.back' | t }}</button>
-          <button class="btn primary small" type="button" (click)="exportDrawing()">{{ 'album.addDrawing' | t }}</button>
-        </div>
-        <app-drawing-canvas (exported)="submitDrawing($event)"></app-drawing-canvas>
+      <div class="modal-actions">
+        <button class="btn ghost" (click)="addStep='choose'">{{ 'album.back' | t }}</button>
+        <button class="btn primary" (click)="submitQuote()">{{ 'album.addQuote' | t }}</button>
       </div>
     </div>
+
+    <!-- Draw -->
+    <div *ngIf="addStep === 'draw'" class="draw-step">
+      <div class="draw-step-header">
+        <button class="btn ghost small" type="button" (click)="addStep='choose'">← {{ 'album.back' | t }}</button>
+        <button class="btn primary small" type="button" (click)="exportDrawing()">{{ 'album.addDrawing' | t }}</button>
+      </div>
+      <app-drawing-canvas (exported)="submitDrawing($event)"></app-drawing-canvas>
+    </div>
   </div>
+</div>
 
-  <div class="modal-backdrop" *ngIf="showAddPersonModal">
-    <div class="modal">
-      <button class="modal-close" type="button" (click)="closeAddPerson()">&times;</button>
+<div class="modal-backdrop" *ngIf="showAddPersonModal">
+  <div class="modal">
+    <button class="modal-close" type="button" (click)="closeAddPerson()">&times;</button>
 
-      <h2>{{ 'album.addPerson' | t }}</h2>
+    <h2>{{ 'album.addPerson' | t }}</h2>
 
-      <div class="modal-body">
-        <div class="field">
-          <label>{{ 'album.search' | t }}</label>
-          <input
-            class="input"
-            [(ngModel)]="personQuery"
-            (input)="updatePersonResults()"
-            [placeholder]="'album.searchPlaceholder' | t"
-          />
-        </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>{{ 'album.search' | t }}</label>
+        <input
+          class="input"
+          [(ngModel)]="personQuery"
+          (input)="updatePersonResults()"
+          [placeholder]="'album.searchPlaceholder' | t"
+        />
+      </div>
 
-        <div class="list">
-          <button
-            type="button"
-            class="list-item"
-            *ngFor="let u of personResults"
-            (click)="addPersonToAlbum(u.userId)"
-          >
-            <span class="avatar">
-              {{ u.name.charAt(0) }}
-            </span>
-            <span class="name">{{ u.name }}</span>
-            <span class="muted">({{ u.role }})</span>
-          </button>
-        </div>
+      <div class="list">
+        <button
+          type="button"
+          class="list-item"
+          *ngFor="let u of personResults"
+          (click)="addPersonToAlbum(u.userId)"
+        >
+          <span class="avatar">
+            {{ u.name.charAt(0) }}
+          </span>
+          <span class="name">{{ u.name }}</span>
+          <span class="muted">({{ u.role }})</span>
+        </button>
       </div>
     </div>
   </div>
