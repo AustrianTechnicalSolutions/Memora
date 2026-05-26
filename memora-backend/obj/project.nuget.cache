@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "eg3tDWGHaAY=",
+  "dgSpecHash": "mq2FE8vHxo4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\memora-backend\\memora-backend.csproj",
+  "projectFilePath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\memora\\memora-backend\\memora-backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\gajip\\.nuget\\packages\\csvhelper\\33.1.0\\csvhelper.33.1.0.nupkg.sha512",
     "C:\\Users\\gajip\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
