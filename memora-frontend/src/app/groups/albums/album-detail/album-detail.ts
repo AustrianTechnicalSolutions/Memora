@@ -126,6 +126,9 @@ export class AlbumDetailComponent implements OnDestroy {
 
   ngOnDestroy() {
     clearInterval(this.refreshTimer);
+    if (this.randomMemoryTimer) {
+      window.clearTimeout(this.randomMemoryTimer);
+    }
   }
 
   // Polls server every 10s and syncs the full memory list:
@@ -342,12 +345,6 @@ export class AlbumDetailComponent implements OnDestroy {
       this.randomMemoryStatus = '';
       this.openMemory(pool[randomIndex]);
     }, 1800);
-  }
-
-  ngOnDestroy() {
-    if (this.randomMemoryTimer) {
-      window.clearTimeout(this.randomMemoryTimer);
-    }
   }
 
   closeMemory() {
@@ -924,14 +921,17 @@ export class AlbumDetailComponent implements OnDestroy {
 
   // Searching
   applySearch() {
+    // First apply any explicit filters, then the full-text search on the reduced set.
+    const base = this.applyFiltersToItems(this.items);
+
     const tokens = this.tokenize(this.searchQuery);
 
     if (!tokens.length) {
-      this.filteredItems = [...this.items];
+      this.filteredItems = [...base];
       return;
     }
 
-    const scored = this.items.map(m => ({
+    const scored = base.map(m => ({
       memory: m,
       score: this.scoreMemory(m, tokens)
     }));
@@ -940,6 +940,72 @@ export class AlbumDetailComponent implements OnDestroy {
       .filter(x => x.score > 0.5)
       .sort((a, b) => b.score - a.score)
       .map(x => x.memory);
+  }
+
+  // Filter UI state
+  showFilterModal = false;
+  filterCriteria: {
+    userId?: string | null;
+    dateFrom?: string | null;
+    dateTo?: string | null;
+    mediaType?: 'any' | 'photo' | 'video' | 'quote';
+    hasLocation?: boolean;
+  } = { userId: null, dateFrom: null, dateTo: null, mediaType: 'any', hasLocation: false };
+
+  openFilterModal() {
+    this.showFilterModal = true;
+  }
+
+  closeFilterModal() {
+    this.showFilterModal = false;
+  }
+
+  clearFilter() {
+    this.filterCriteria = { userId: null, dateFrom: null, dateTo: null, mediaType: 'any', hasLocation: false };
+    this.applySearch();
+    this.closeFilterModal();
+  }
+
+  applyFilter() {
+    this.applySearch();
+    this.closeFilterModal();
+  }
+
+  private applyFiltersToItems(source: MemoryDto[]) {
+    return source.filter(m => {
+      const f = this.filterCriteria;
+
+      if (!f) return true;
+
+      if (f.userId) {
+        if (m.createdByUserId !== f.userId) return false;
+      }
+
+      if (f.mediaType && f.mediaType !== 'any') {
+        if (f.mediaType === 'photo' && m.type !== 0) return false;
+        if (f.mediaType === 'video' && m.type !== 1) return false;
+        if (f.mediaType === 'quote' && m.type !== 2) return false;
+      }
+
+      if (f.hasLocation) {
+        const hasLoc = !!(m.locationName || m.locationCity || m.locationCountry || m.latitude);
+        if (!hasLoc) return false;
+      }
+
+      if (f.dateFrom) {
+        const d = new Date(m.happenedAt).setHours(0,0,0,0);
+        const from = new Date(f.dateFrom).setHours(0,0,0,0);
+        if (d < from) return false;
+      }
+
+      if (f.dateTo) {
+        const d = new Date(m.happenedAt).setHours(0,0,0,0);
+        const to = new Date(f.dateTo).setHours(0,0,0,0);
+        if (d > to) return false;
+      }
+
+      return true;
+    });
   }
 
   tokenize(query: string): string[] {
