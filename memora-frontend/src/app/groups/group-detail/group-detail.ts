@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { GroupsService, GroupDetailDto, MemoryDto, AlbumDto, GroupStatsDto, GroupWeeklyActivityDto, GroupMemberActivityDto } from '../groups';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +13,7 @@ import { ChallengeNotificationComponent } from '../challenge-notification/challe
 @Component({
   selector: 'app-group-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, GuessGameComponent, ChallengeNotificationComponent],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, GuessGameComponent, ChallengeNotificationComponent],
   templateUrl: './group-detail.html',
   styleUrls: ['./group-detail.css']
 })

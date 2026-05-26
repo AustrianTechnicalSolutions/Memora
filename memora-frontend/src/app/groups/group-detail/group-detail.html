@@ -50,6 +50,10 @@
         🧠 Guess the Memory
       </button>
 
+      <button class="btn secondary cover-action" [routerLink]="['/groups', groupId, 'timeline']">
+        📅 Timeline
+      </button>
+
       <button
         *ngIf="isAdmin"
         class="btn secondary cover-action"
