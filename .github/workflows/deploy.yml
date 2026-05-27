@@ -23,6 +23,8 @@ jobs:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USER }}
           key: ${{ secrets.PI_SSH_KEY }}
+          command_timeout: 20m
           script: |
             cd /home/nico/Documents/Memora
             bash deploy.sh
+            echo "DEPLOY_DONE"
