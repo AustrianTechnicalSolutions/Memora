@@ -25,4 +25,4 @@ jobs:
           key: ${{ secrets.PI_SSH_KEY }}
           script: |
             cd /home/nico/Documents/Memora
-            ./deploy.sh
+            bash deploy.sh
