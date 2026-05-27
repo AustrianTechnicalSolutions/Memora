@@ -24,4 +24,5 @@ jobs:
           username: ${{ secrets.PI_USER }}
           key: ${{ secrets.PI_SSH_KEY }}
           script:
-            ./deploy.sh
+            cd Memora
+            ~/deploy.sh
