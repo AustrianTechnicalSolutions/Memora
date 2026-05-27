@@ -23,6 +23,6 @@ jobs:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USER }}
           key: ${{ secrets.PI_SSH_KEY }}
-          script:
+          script: |
             cd Memora
             ~/deploy.sh
