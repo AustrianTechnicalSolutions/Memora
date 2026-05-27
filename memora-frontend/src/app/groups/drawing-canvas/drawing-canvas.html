@@ -1,0 +1,80 @@
+<div class="draw-wrap">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+
+    <!-- Tools -->
+    <div class="tool-group">
+      <button class="tool-btn" [class.active]="tool === 'pen'" (click)="tool = 'pen'" title="Stift">
+        ✏️
+      </button>
+      <button class="tool-btn" [class.active]="tool === 'eraser'" (click)="tool = 'eraser'" title="Radierer">
+        🧹
+      </button>
+      <button class="tool-btn" [class.active]="tool === 'text'" (click)="tool = 'text'" title="Text">
+        T
+      </button>
+      <button class="tool-btn danger" (click)="clear()" title="Leeren">
+        🗑️
+      </button>
+    </div>
+
+    <!-- Brush sizes -->
+    <div class="tool-group sizes">
+      <button
+        *ngFor="let s of sizes"
+        class="size-btn"
+        [class.active]="selectedSize === s"
+        (click)="selectedSize = s"
+        [title]="s + 'px'"
+      >
+        <span class="dot" [style.width.px]="s + 4" [style.height.px]="s + 4"></span>
+      </button>
+    </div>
+
+    <!-- Colors -->
+    <div class="tool-group colors">
+      <button
+        *ngFor="let c of colors"
+        class="color-swatch"
+        [class.active]="selectedColor === c"
+        [style.background]="c"
+        (click)="selectedColor = c"
+        [title]="c"
+      ></button>
+    </div>
+
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-container">
+    <canvas
+      #canvas
+      class="draw-canvas"
+      (mousedown)="onMouseDown($event)"
+      (mousemove)="onMouseMove($event)"
+      (mouseup)="onMouseUp()"
+      (mouseleave)="onMouseLeave()"
+      (touchstart)="onTouchStart($event)"
+      (touchmove)="onTouchMove($event)"
+      (touchend)="onTouchEnd($event)"
+      [style.cursor]="tool === 'text' ? 'text' : tool === 'eraser' ? 'cell' : 'crosshair'"
+    ></canvas>
+
+    <!-- Floating text input -->
+    <input
+      *ngIf="showTextInput"
+      id="canvas-text-input"
+      #textInput
+      class="canvas-text-input"
+      type="text"
+      [(ngModel)]="textValue"
+      (keydown)="onTextKeydown($event)"
+      (blur)="commitText()"
+      [style.font-size.px]="selectedSize * 4 + 8"
+      [style.color]="selectedColor"
+    />
+  </div>
+
+
+</div>

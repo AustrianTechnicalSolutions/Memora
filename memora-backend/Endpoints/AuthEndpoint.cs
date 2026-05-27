@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OtpNet;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Text.Json;
 
 namespace AuthApi.Endpoints;
 
@@ -73,19 +74,57 @@ public class AuthController : BaseApiController
 
         if (user.TwoFactorEnabled)
         {
-            if (string.IsNullOrWhiteSpace(user.TwoFactorSecret))
-                throw new ApiException("unauthorized", "2fa not configured", 401);
-
             if (string.IsNullOrWhiteSpace(req.TwoFactorCode))
-                throw new ApiException("unauthorized", "2fa is required", 401);
+                throw new ApiException("2fa_required", "2fa is required", 401);
 
-            var totp = new Totp(Base32Encoding.ToBytes(user.TwoFactorSecret));
-            var ok = totp.VerifyTotp(req.TwoFactorCode.Trim(), out _, new VerificationWindow(1, 1));
+            var validTotp = false;
 
-            if (!ok)
-                throw new ApiException("unauthorized", "2fa code is invalid", 401);
+            if (!string.IsNullOrWhiteSpace(user.TwoFactorSecret))
+            {
+                var totp = new Totp(Base32Encoding.ToBytes(user.TwoFactorSecret));
+                validTotp = totp.VerifyTotp(
+                    req.TwoFactorCode.Trim(),
+                    out _,
+                    new VerificationWindow(1, 1)
+                );
+            }
+
+            var validBackupCode = await VerifyBackupCode(user, req.TwoFactorCode);
+
+            if (!validTotp && !validBackupCode)
+                throw new ApiException("2fa_invalid", "2fa code is invalid", 401);
         }
 
         return Ok(new AuthResponse(_jwtSvc.CreateToken(user)));
+    }
+
+    private async Task<bool> VerifyBackupCode(AppUser user, string code)
+    {
+        if (string.IsNullOrWhiteSpace(user.TwoFactorBackupCodesJson))
+            return false;
+
+        var codes = JsonSerializer.Deserialize<List<string>>(
+            user.TwoFactorBackupCodesJson
+        ) ?? [];
+
+        var normalized = code.Trim().ToUpperInvariant();
+
+        var match = codes.FirstOrDefault(x =>
+            x.Trim().ToUpperInvariant() == normalized
+        );
+
+        if (match is null)
+            return false;
+
+        // remove used code
+        codes.Remove(match);
+
+        user.TwoFactorBackupCodesJson =
+            JsonSerializer.Serialize(codes);
+
+        // IMPORTANT: persist immediately
+        await _db.SaveChangesAsync();
+
+        return true;
     }
 }

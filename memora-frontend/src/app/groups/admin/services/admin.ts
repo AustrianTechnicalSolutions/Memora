@@ -114,7 +114,7 @@ export interface CreateAlbumRequest {
 
 @Injectable({ providedIn: 'root' })
 export class GroupAdminService {
-  private base = `${environment.apiUrl}/api/groups`;
+  private base = environment.apiUrl + '/api/groups';
 
   constructor(private http: HttpClient, private groupsService: GroupsService) {}
 

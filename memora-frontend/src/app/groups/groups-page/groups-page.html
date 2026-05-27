@@ -4,8 +4,12 @@
       <h1 class="title">{{ 'groups.title' | t }}</h1>
       <p class="subtitle">{{ 'groups.subtitle' | t }}</p>
     </div>
+    <button class="btn ghost icon-btn" (click)="loadGroups()" [disabled]="loading" title="Aktualisieren">
+      ↻
+    </button>
   </header>
 
+  <!-- CREATE GROUP -->
   <section class="panel">
     <div class="panel-head">
       <h2 class="panel-title">{{ 'groups.createTitle' | t }}</h2>
@@ -19,42 +23,56 @@
         [(ngModel)]="newGroupName"
         (keyup.enter)="createGroup()"
       />
-
       <button class="btn primary" (click)="createGroup()" [disabled]="creating || !newGroupName.trim()">
         {{ creating ? ('groups.creating' | t) : ('groups.create' | t) }}
       </button>
     </div>
-
     <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
   </section>
 
+  <!-- MY GROUPS -->
   <section class="panel">
     <div class="panel-head">
       <h2 class="panel-title">{{ 'groups.myGroups' | t }}</h2>
-      <span class="muted">{{ 'groups.total' | t:{ count: groups.length } }}</span>
+      <span class="muted">{{ 'groups.total' | t:{ count: filteredGroups.length } }}</span>
+    </div>
+
+    <!-- Search bar (only shown when there are multiple groups) -->
+    <div class="search-row" *ngIf="groups.length > 2">
+      <input
+        class="input search-input"
+        placeholder="Gruppe suchen..."
+        [(ngModel)]="searchQuery"
+      />
     </div>
 
     <div class="loading" *ngIf="loading">{{ 'groups.loading' | t }}</div>
 
     <div class="grid" *ngIf="!loading">
-      <a class="group-card" *ngFor="let g of groups" [routerLink]="['/groups', g.id]">
+      <a class="group-card" *ngFor="let g of filteredGroups" [routerLink]="['/groups', g.id]" [attr.data-initial]="g.name.charAt(0).toUpperCase()">
         <div class="group-top">
           <div class="group-name">{{ g.name }}</div>
           <div class="arrow">→</div>
         </div>
-
         <div class="group-meta">
           <span class="pill">{{ 'groups.members' | t:{ count: g.memberCount } }}</span>
         </div>
       </a>
 
-      <div class="empty" *ngIf="groups.length === 0">
+      <div class="empty" *ngIf="filteredGroups.length === 0 && searchQuery">
+        <div class="empty-title">Keine Ergebnisse</div>
+        <div class="empty-sub">Keine Gruppe passt zu "{{ searchQuery }}".</div>
+      </div>
+
+      <div class="empty" *ngIf="groups.length === 0 && !searchQuery">
+        <div class="empty-icon">⧉</div>
         <div class="empty-title">{{ 'groups.emptyTitle' | t }}</div>
         <div class="empty-sub">{{ 'groups.emptySub' | t }}</div>
       </div>
     </div>
   </section>
 
+  <!-- JOIN GROUP -->
   <section class="panel">
     <div class="panel-head">
       <h2 class="panel-title">{{ 'groups.joinTitle' | t }}</h2>
@@ -68,12 +86,12 @@
         [(ngModel)]="inviteCode"
         (keyup.enter)="joinGroup()"
       />
-
       <button class="btn primary" (click)="joinGroup()" [disabled]="joining || !inviteCode.trim()">
         {{ joining ? ('groups.joining' | t) : ('groups.join' | t) }}
       </button>
     </div>
 
+    <p class="success" *ngIf="joinSuccessMsg">{{ joinSuccessMsg }}</p>
     <p class="error" *ngIf="joinErrorMsg">{{ joinErrorMsg }}</p>
   </section>
 </div>

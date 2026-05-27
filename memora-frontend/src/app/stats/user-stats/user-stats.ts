@@ -186,8 +186,7 @@ export class UserStatsPageComponent {
     const videoCount = own.filter((m) => m.type === 1).length;
     const postCount = own.length;
 
-    // Like data does not exist yet in backend -> deterministic placeholder.
-    const likesTotal = postCount === 0 ? 0 : Math.round(postCount * 1.8 + quoteCount * 0.7 + 9);
+    const likesTotal = own.reduce((sum, m) => sum + (m.likeCount ?? 0), 0);
     const likesPerPost = postCount === 0 ? 0 : likesTotal / postCount;
 
     const groupPosts = memories.length;
@@ -217,8 +216,6 @@ export class UserStatsPageComponent {
         label: this.i18n.translate('stats.likesTotal'),
         value: `${likesTotal}`,
         description: scopeLabel,
-        hint: this.i18n.translate('stats.demoValue'),
-        placeholder: true,
         tone: 'accent'
       },
       {
@@ -226,8 +223,6 @@ export class UserStatsPageComponent {
         label: this.i18n.translate('stats.likesPerPost'),
         value: likesPerPost.toFixed(2),
         description: this.i18n.translate('stats.likesAverage'),
-        hint: this.i18n.translate('stats.demoValue'),
-        placeholder: true,
         tone: 'accent'
       },
       {

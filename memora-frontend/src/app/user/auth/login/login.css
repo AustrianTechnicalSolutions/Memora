@@ -57,21 +57,53 @@
 }
 
 /* Footer text */
-.auth-card p {
+.auth-card {
   margin-top: 1rem;
   font-size: 14px;
 }
 
-.auth-card p a {
-  color: var(--accent);
-  font-weight: bold;
-  text-decoration: underline;
+.auth-card h2 {
+  margin: 0 0 2rem;
 }
 
-.auth-card .error {
-  color: var(--danger);
+.auth-card input {
+  box-sizing: border-box;
+  margin-bottom: 1.25rem;
 }
 
-.auth-card .error-inline {
-  margin-top: 1rem;
+.twofa-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  margin-top: 0.75rem;
+}
+
+.twofa-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.hint {
+  margin: 0;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.7);
+}
+
+.twofa-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.auth-card button {
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-primary);
 }

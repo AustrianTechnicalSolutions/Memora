@@ -13,8 +13,8 @@
 }
 
 .ga-card {
-  background: #fff;
-  border: 1px solid #e6e6e6;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 14px;
 }
@@ -37,11 +37,11 @@
   height: 22px;
   border-radius: 999px;
   object-fit: cover;
-  border: 1px solid #e6e6e6;
+  border: 1px solid var(--border);
 }
 
 .ga-row { display: inline-flex; align-items: center; gap: 8px; }
 
 .ga-table-wrap { overflow: auto; }
 .ga-table { width: 100%; border-collapse: collapse; }
-.ga-table th, .ga-table td { padding: 10px; border-bottom: 1px solid #f0f0f0; text-align: left; }
+.ga-table th, .ga-table td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }

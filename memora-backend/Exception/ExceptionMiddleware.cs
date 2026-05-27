@@ -9,6 +9,7 @@ public class ExceptionMiddleware
         _next = next;
     }
 
+
     public async Task Invoke(HttpContext context)
     {
         try

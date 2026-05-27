@@ -43,7 +43,11 @@
             "twoFactorHelp": "Enter your 2FA code from Microsoft Authenticator.",
             "twoFactorInvalid": "Invalid 2FA code.",
             "failed": "Email or Password is invalid.",
-            "rateLimited": "Too many requests, please slow down."
+            "rateLimited": "Too many requests, please slow down.",
+
+            "twoFactorPlaceholder": "123456 or backup code",
+            "verifyTwoFactor": "Verify code",
+            "backToLogin": "Back to login"
         },
         "register": {
             "title": "Create Account",
@@ -120,12 +124,41 @@
         "passwordChangeFailed": "Could not change password.",
         "profileLoadFailed": "Could not load profile.",
         "selectImage": "Please select an image file.",
-        "twoFactorSetupHint": "Scan the QR code with Microsoft Authenticator, then enter the 6-digit code.",
+        "2fa": "Two factor authentication",
+        "twoFactorTitle": "Two-factor authentication",
+        "twoFactorDisabledHint": "Protect your account with an authenticator app.",
+        "twoFactorEnabledHint": "Your account is protected with two-factor authentication.",
+
+        "twoFactorSetup": "Set up 2FA",
+        "twoFactorSetupHint": "Scan the QR code with Microsoft Authenticator, Google Authenticator, or Authy, then enter the 6-digit code.",
         "twoFactorSetupFailed": "Could not start 2FA setup.",
+
+        "twoFactorSecret": "Manual setup key",
+        "twoFactorCode": "Authentication code",
+
+        "twoFactorEnable": "Enable 2FA",
         "twoFactorEnabled": "2FA enabled successfully.",
         "twoFactorInvalid": "Invalid 2FA code.",
+
+        "twoFactorBackupCodes": "Backup codes",
+        "twoFactorBackupCodesHint": "Store these backup codes in a safe place. Each code can only be used once.",
+        "twoFactorBackupCodesGenerated": "Backup codes regenerated successfully.",
+        "twoFactorRegenerateBackupCodes": "Regenerate backup codes",
+
+        "twoFactorDisable": "Disable 2FA",
+        "twoFactorDisableCode": "Enter your authentication code",
         "twoFactorDisabled": "2FA disabled.",
-        "twoFactorDisableFailed": "Could not disable 2FA."
+        "twoFactorDisableFailed": "Could not disable 2FA.",
+
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "twoFactorSetupIntro": "Use an authenticator app to add an extra layer of protection to your account.",
+        "twoFactorScanTitle": "Scan the QR code",
+        "twoFactorBackupCodesReady": "Backup codes ready",
+        "twoFactorBackupCodesDownloadHint": "Download your backup codes now. For security reasons, they will not be shown on this page.",
+        "downloadBackupCodes": "Download backup codes",
+        "twoFactorRegenerateHint": "Generate new backup codes. Your old backup codes will stop working.",
+        "twoFactorDisableHint": "Enter your current authenticator or backup code to remove two-factor authentication from your account."
     },
     "stats": {
         "eyebrow": "Memora Analytics",
@@ -236,7 +269,9 @@
         "reply": "Reply",
         "cancel": "Cancel",
         "replyingTo": "Replying to {name}",
-        "unknownUser": "Unknown"
+        "unknownUser": "Unknown",
+        "draw": "Draw",
+        "addDrawing": "Add Drawing"
     },
     "group": {
         "inviteCode": "Invite code",
@@ -271,12 +306,29 @@
         "firstAlbum": "First album added",
         "comingSoon": "Coming soon"
     },
+    "duel": {
+        "challenged": "You've been challenged!",
+        "challengedBy": "{name} is challenging you to a Memory Duel.",
+        "accept": "Accept",
+        "decline": "Decline",
+        "challenge": "Challenge",
+        "online": "Online",
+        "youWon": "You won!",
+        "opponentWon": "Opponent won.",
+        "tie": "It's a tie!",
+        "you": "You",
+        "opponent": "Opponent",
+        "waitingOpponent": "Waiting for opponent...",
+        "declined": "{name} declined your challenge.",
+        "opponentQuit": "Your opponent left the game."
+    },
     "impressum": {
         "provider": "Provider",
         "representedBy": "Represented by",
         "contact": "Contact",
         "liability": "Liability notice",
-        "liabilityText": "Despite careful review, we assume no liability for the contents of external links."
+        "liabilityText": "Despite careful review, we assume no liability for the contents of external links.",
+        "subtitle": "Information about the team behind Memora."
     },
     "admin": {
         "groupAdmin": "Group Admin",

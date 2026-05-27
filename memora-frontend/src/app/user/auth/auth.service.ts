@@ -13,9 +13,15 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string) {
+  login(email: string, password: string, twoFactorCode?: string) {
+    const body: any = { email, password };
+
+    if (twoFactorCode?.trim()) {
+      body.twoFactorCode = twoFactorCode.trim();
+    }
+
     return this.http
-      .post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
+      .post<AuthResponse>(`${this.apiUrl}/login`, body)
       .pipe(
         tap(res => localStorage.setItem('token', res.token))
       );

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,15 +8,20 @@ import { TranslatePipe } from '../../../translation/translate.pipe';
 import { I18nService } from '../../../translation/i18n.service';
 import { environment } from '../../../../environment';
 import * as exifr from 'exifr';
+import { AuthService } from '../../../user/auth.service';
+import { DrawingCanvasComponent } from '../../drawing-canvas/drawing-canvas';
 
 @Component({
   selector: 'app-album-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, TranslatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, TranslatePipe, DrawingCanvasComponent],
   templateUrl: './album-detail.html',
   styleUrls: ['./album-detail.css']
 })
-export class AlbumDetailComponent {
+export class AlbumDetailComponent implements OnDestroy {
+  @ViewChild(DrawingCanvasComponent) drawingCanvas?: DrawingCanvasComponent;
+
+
   private readonly backendOrigin = `${window.location.protocol}//${window.location.hostname}:5000`;
   groupId!: string;
   albumId!: string;
@@ -57,7 +62,7 @@ export class AlbumDetailComponent {
 
   // Adding a memory
   showAddMemoryModal = false;
-  addStep: 'choose' | 'media' | 'quote' = 'choose';
+  addStep: 'choose' | 'media' | 'quote' | 'draw' = 'choose';
   mediaType: 'photo' | 'video' = 'photo';
   previewUrl: string | null = null;
   failedMedia = new Set<string>();
@@ -84,22 +89,127 @@ export class AlbumDetailComponent {
   searchQuery = '';
   filteredItems: MemoryDto[] = [];
 
+  // Delete a memory
+  currentUserId: string | null = null;
+  isAdmin = false;
+  isPreparingRandomMemory = false;
+  randomMemoryStatus = '';
+  private randomMemoryTimer?: number;
+
+  private refreshTimer?: ReturnType<typeof setInterval>;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private groupsService: GroupsService,
     private i18n: I18nService,
-    private http: HttpClient
+    private http: HttpClient,
+    private auth: AuthService
   ) {}
 
   ngOnInit() {
     this.groupId = this.route.snapshot.paramMap.get('id')!;
     this.albumId = this.route.snapshot.paramMap.get('albumId')!;
+    
+    this.auth.currentUser().subscribe(u => {
+      this.currentUserId = u.id;
+      this.updateAdminState();
+    });
 
     this.loadAlbum();
     this.loadAlbumPeople();
     this.loadMemories();
     this.loadMembers();
+
+    this.refreshTimer = setInterval(() => this.refreshCounts(), 10_000);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.refreshTimer);
+    if (this.randomMemoryTimer) {
+      window.clearTimeout(this.randomMemoryTimer);
+    }
+  }
+
+  // Polls server every 10s and syncs the full memory list:
+  // - adds new memories posted by other users (+ loads their media)
+  // - removes memories deleted by others
+  // - patches likeCount / commentCount / isLiked in-place (no media re-download)
+  // - refreshes comments silently when the modal is open
+  private refreshCounts() {
+    const query: any = { sort: 'newest', page: 1, pageSize: 50 };
+    if (this.albumId !== 'all') query.albumId = this.albumId;
+
+    this.groupsService.memories(this.groupId, query).subscribe({
+      next: (r) => {
+        const serverById = new Map(r.items.map(m => [m.id, m]));
+        const localById  = new Map(this.items.map(m => [m.id, m]));
+
+        // 1. Patch existing items in-place (no flicker, no media re-fetch)
+        for (const item of this.items) {
+          const fresh = serverById.get(item.id);
+          if (fresh) {
+            item.likeCount    = fresh.likeCount;
+            item.commentCount = fresh.commentCount;
+            item.isLiked      = fresh.isLiked;
+          }
+        }
+
+        // 2. Add memories that appeared since last poll
+        for (const fresh of r.items) {
+          if (!localById.has(fresh.id)) {
+            this.items.unshift(fresh);
+            // Trigger media blob load for photo/video memories
+            if (fresh.type === 0 || fresh.type === 1) {
+              this.loadMedia(fresh.mediaUrl);
+            }
+          }
+        }
+
+        // 3. Remove memories that were deleted on the server
+        this.items = this.items.filter(m => serverById.has(m.id));
+
+        // 4. Keep filteredItems in sync (re-apply current search)
+        this.applySearch();
+
+        // 5. Update open modal memory
+        if (this.activeMemory) {
+          const fresh = serverById.get(this.activeMemory.id);
+          if (fresh) {
+            this.activeMemory.likeCount    = fresh.likeCount;
+            this.activeMemory.commentCount = fresh.commentCount;
+            this.activeMemory.isLiked      = fresh.isLiked;
+          }
+        }
+      },
+      error: () => {}
+    });
+
+    // 6. Silently refresh comments when the modal is open
+    if (this.showMemoryModal && this.activeMemory) {
+      this.silentRefreshComments();
+    }
+  }
+
+  // Refreshes comments without showing a loading indicator or resetting the text input.
+  private silentRefreshComments() {
+    if (!this.activeMemory) return;
+
+    this.groupsService.memoryComments(this.groupId, this.activeMemory.id).subscribe({
+      next: (r) => {
+        // Only rebuild tree if something actually changed (count or last id)
+        const changed =
+          r.length !== this.comments.length ||
+          (r.length > 0 && r[r.length - 1]?.id !== this.comments[this.comments.length - 1]?.id);
+
+        if (changed) {
+          this.comments = r;
+          this.rebuildCommentTree();
+          this.activeMemory!.commentCount = r.length;
+        }
+      },
+      error: () => {}
+    });
   }
 
   backToAlbums() {
@@ -160,14 +270,23 @@ export class AlbumDetailComponent {
     this.groupsService.groupMembers(this.groupId).subscribe({
       next: (r) => {
         this.members = r;
+
         this.memberById = r.reduce((acc, m) => {
           acc[m.userId] = { name: m.name, avatarUrl: m.avatarUrl ?? null };
           return acc;
         }, {} as { [key: string]: { name: string; avatarUrl?: string | null } });
+
+        this.updateAdminState();
         this.updateActiveUploader();
       },
       error: (err) => console.error(err)
     });
+  }
+
+  private updateAdminState() {
+    this.isAdmin = this.members.some(
+      m => m.userId === this.currentUserId && m.role === 'Admin'
+    );
   }
 
   loadMedia(url?: string | null) {
@@ -197,6 +316,35 @@ export class AlbumDetailComponent {
     this.commentText = '';
     this.replyTo = null;
     this.loadComments();
+  }
+
+  openRandomMemory() {
+    if (this.isPreparingRandomMemory) return;
+
+    const pool = this.filteredItems.length > 0 ? this.filteredItems : this.items;
+
+    if (!pool.length) return;
+
+    const statusMessages = [
+      'Shuffling through the album for a hidden gem...',
+      'Picking a memory at random...',
+      'Dusting off a surprise worth revisiting...',
+      'Revealing something unexpected...'
+    ];
+
+    this.isPreparingRandomMemory = true;
+    this.randomMemoryStatus = statusMessages[Math.floor(Math.random() * statusMessages.length)];
+
+    if (this.randomMemoryTimer) {
+      window.clearTimeout(this.randomMemoryTimer);
+    }
+
+    this.randomMemoryTimer = window.setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      this.isPreparingRandomMemory = false;
+      this.randomMemoryStatus = '';
+      this.openMemory(pool[randomIndex]);
+    }, 1800);
   }
 
   closeMemory() {
@@ -367,6 +515,12 @@ export class AlbumDetailComponent {
   }
 
   createMemory() {
+    // Resolve tagged user IDs to display names so the backend stores names, not UUIDs
+    const resolvedPeople = [
+      ...this.taggedUserIds.map(id => this.memberById[id]?.name ?? id),
+      ...this.freeTextPeople,
+    ];
+
     const baseData: any = {
       type: this.newType,
       title: this.newTitle || null,
@@ -374,12 +528,12 @@ export class AlbumDetailComponent {
       quoteBy: this.newType === 2 ? (this.newQuoteBy || null) : null,
       happenedAt: new Date(this.newDate).toISOString(),
       tags: [],
-      people: this.taggedUserIds,
+      people: resolvedPeople,
       albumId: this.albumId !== 'all' ? this.albumId : null,
 
       location: this.newLocationName ?? null,
-      latitude: this.autoLat ?? null,
-      longitude: this.autoLong ?? null
+      latitude: this.useGps ? (this.autoLat ?? null) : null,
+      longitude: this.useGps ? (this.autoLong ?? null) : null,
     };
 
     if (this.newType === 2) {
@@ -412,6 +566,9 @@ export class AlbumDetailComponent {
     this.loadMemories();
     this.newQuoteBy = '';
     this.showMentionPopup = false;
+    this.taggedUserIds = [];
+    this.freeTextPeople = [];
+    this.mediaTagInput = '';
   }
 
   // Mentioning
@@ -551,6 +708,30 @@ export class AlbumDetailComponent {
     this.showAddMemoryModal = false;
   }
 
+  exportDrawing() {
+    this.drawingCanvas?.export();
+  }
+
+  submitDrawing(file: File) {
+    const data = {
+      type: 0,
+      title: 'Drawing',
+      quoteText: null,
+      happenedAt: new Date().toISOString(),
+      albumId: this.albumId !== 'all' ? this.albumId : null,
+      tags: [],
+      people: [],
+    };
+
+    this.groupsService.createMemoryWithFile(this.groupId, file, data).subscribe({
+      next: () => {
+        this.showAddMemoryModal = false;
+        this.loadMemories();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
   isImage(url: string | null | undefined): boolean {
     if (!url) return false;
     const result = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
@@ -572,7 +753,6 @@ export class AlbumDetailComponent {
   }
 
   mediaFailed(url: string | null | undefined): boolean {
-    console.log("media failed");
     return !!url && this.failedMedia.has(url);
   }
 
@@ -720,7 +900,6 @@ export class AlbumDetailComponent {
   }
 
   getTaggedUsers(memory: MemoryDto) {
-    console.log(memory)
     return (memory.people || [])
       .map(id => ({
         userId: id,
@@ -742,14 +921,17 @@ export class AlbumDetailComponent {
 
   // Searching
   applySearch() {
+    // First apply any explicit filters, then the full-text search on the reduced set.
+    const base = this.applyFiltersToItems(this.items);
+
     const tokens = this.tokenize(this.searchQuery);
 
     if (!tokens.length) {
-      this.filteredItems = [...this.items];
+      this.filteredItems = [...base];
       return;
     }
 
-    const scored = this.items.map(m => ({
+    const scored = base.map(m => ({
       memory: m,
       score: this.scoreMemory(m, tokens)
     }));
@@ -758,6 +940,72 @@ export class AlbumDetailComponent {
       .filter(x => x.score > 0.5)
       .sort((a, b) => b.score - a.score)
       .map(x => x.memory);
+  }
+
+  // Filter UI state
+  showFilterModal = false;
+  filterCriteria: {
+    userId?: string | null;
+    dateFrom?: string | null;
+    dateTo?: string | null;
+    mediaType?: 'any' | 'photo' | 'video' | 'quote';
+    hasLocation?: boolean;
+  } = { userId: null, dateFrom: null, dateTo: null, mediaType: 'any', hasLocation: false };
+
+  openFilterModal() {
+    this.showFilterModal = true;
+  }
+
+  closeFilterModal() {
+    this.showFilterModal = false;
+  }
+
+  clearFilter() {
+    this.filterCriteria = { userId: null, dateFrom: null, dateTo: null, mediaType: 'any', hasLocation: false };
+    this.applySearch();
+    this.closeFilterModal();
+  }
+
+  applyFilter() {
+    this.applySearch();
+    this.closeFilterModal();
+  }
+
+  private applyFiltersToItems(source: MemoryDto[]) {
+    return source.filter(m => {
+      const f = this.filterCriteria;
+
+      if (!f) return true;
+
+      if (f.userId) {
+        if (m.createdByUserId !== f.userId) return false;
+      }
+
+      if (f.mediaType && f.mediaType !== 'any') {
+        if (f.mediaType === 'photo' && m.type !== 0) return false;
+        if (f.mediaType === 'video' && m.type !== 1) return false;
+        if (f.mediaType === 'quote' && m.type !== 2) return false;
+      }
+
+      if (f.hasLocation) {
+        const hasLoc = !!(m.locationName || m.locationCity || m.locationCountry || m.latitude);
+        if (!hasLoc) return false;
+      }
+
+      if (f.dateFrom) {
+        const d = new Date(m.happenedAt).setHours(0,0,0,0);
+        const from = new Date(f.dateFrom).setHours(0,0,0,0);
+        if (d < from) return false;
+      }
+
+      if (f.dateTo) {
+        const d = new Date(m.happenedAt).setHours(0,0,0,0);
+        const to = new Date(f.dateTo).setHours(0,0,0,0);
+        if (d > to) return false;
+      }
+
+      return true;
+    });
   }
 
   tokenize(query: string): string[] {
@@ -905,5 +1153,30 @@ export class AlbumDetailComponent {
     }
 
     return dp[m][n];
+  }
+
+  // Removing memories
+  canRemoveMemory(memory: MemoryDto): boolean {
+    return this.isAdmin || memory.createdByUserId === this.currentUserId;
+  }
+
+  removeMemory(memory: MemoryDto, event?: Event) {
+    event?.stopPropagation();
+
+    if (!this.canRemoveMemory(memory)) return;
+
+    if (!confirm('Remove this memory?')) return;
+
+    this.groupsService.deleteMemory(this.groupId, memory.id).subscribe({
+      next: () => {
+        this.items = this.items.filter(m => m.id !== memory.id);
+        this.filteredItems = this.filteredItems.filter(m => m.id !== memory.id);
+
+        if (this.activeMemory?.id === memory.id) {
+          this.closeMemory();
+        }
+      },
+      error: err => console.error(err)
+    });
   }
 }

@@ -1,3 +1,34 @@
+<app-guess-game
+  *ngIf="showGame"
+  [memories]="items"
+  [members]="members"
+  [albums]="albums"
+  [groupId]="groupId"
+  (closed)="showGame = false"
+></app-guess-game>
+
+<app-guess-game
+  *ngIf="showDuelGame"
+  [memories]="items"
+  [members]="members"
+  [albums]="albums"
+  [groupId]="groupId"
+  [duelId]="activeDuelId"
+  [duelMemoryIds]="activeDuelMemoryIds"
+  (closed)="onDuelGameClosed()"
+></app-guess-game>
+
+<app-challenge-notification
+  *ngIf="pendingChallenge"
+  [challengerName]="pendingChallenge.challengerName"
+  (accepted)="acceptChallenge()"
+  (declined)="declineChallenge()"
+></app-challenge-notification>
+
+<div class="declined-toast" *ngIf="declinedByName" (click)="declinedByName = null">
+  {{ 'duel.declined' | t:{ name: declinedByName } }}
+</div>
+
 <div class="page" *ngIf="group as g">
 
   <!-- Cover -->
@@ -13,6 +44,14 @@
 
       <button class="btn primary cover-action" (click)="goToAlbums()">
         📚 {{ 'group.viewAlbums' | t }}
+      </button>
+
+      <button class="btn secondary cover-action" (click)="showGame = true" *ngIf="items.length > 0">
+        🧠 Guess the Memory
+      </button>
+
+      <button class="btn secondary cover-action" [routerLink]="['/groups', groupId, 'timeline']">
+        📅 Timeline
       </button>
 
       <button
@@ -106,6 +145,7 @@
               <div class="member-name">
                 {{ u.name }}
                 <span *ngIf="u.userId === creatorUserId" class="badge">👑 {{ 'group.creator' | t }}</span>
+                <span *ngIf="isMemberOnline(u.userId)" class="online-dot" title="{{ 'duel.online' | t }}"></span>
               </div>
 
               <div class="member-meta">
@@ -122,6 +162,15 @@
                 <span class="pill photo" *ngIf="u.userId === topPhotoUserId">📸 {{ 'group.mostPhotos' | t }}</span>
                 <span class="pill video" *ngIf="u.userId === topVideoUserId">🎞️ {{ 'group.mostVideos' | t }}</span>
               </div>
+
+              <button
+                *ngIf="isMemberOnline(u.userId) && items.length > 0"
+                class="btn-duel-challenge"
+                [disabled]="challengeSentTo !== null || showDuelGame"
+                (click)="challengeMember(u.userId)"
+              >
+                ⚔️ {{ challengeSentTo === u.userId ? '...' : ('duel.challenge' | t) }}
+              </button>
             </div>
           </div>
         </div>

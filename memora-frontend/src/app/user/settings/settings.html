@@ -148,10 +148,162 @@
         <input type="password" class="input" [(ngModel)]="password.newPassword" />
       </div>
 
+      <div class="form-group full" *ngIf="twoFaEnabled">
+        <label>{{ 'settings.twoFactorCode' | t }}</label>
+        <input
+          type="text"
+          class="input"
+          [(ngModel)]="password.twoFactorCode"
+          maxlength="20"
+          autocomplete="one-time-code"
+          inputmode="numeric"
+          placeholder="123456 oder Backup-Code"
+        />
+        <span class="hint" style="color: var(--accent); font-size: 12px; margin-top: 4px; display: block;">
+          2FA aktiv — Code erforderlich zum Ändern des Passworts
+        </span>
+      </div>
+
       <div class="form-group full">
         <button class="btn primary" (click)="changePassword()">
           {{ 'settings.changePassword' | t }}
         </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2FA -->
+  <section class="card">
+    <div class="card-header">
+      <h2>{{ 'settings.2fa' | t }}</h2>
+    </div>
+
+    <div class="twofa-card">
+      <div class="twofa-top">
+        <div>
+          <p>
+            {{
+              twoFaEnabled
+                ? ('settings.twoFactorEnabledHint' | t)
+                : ('settings.twoFactorDisabledHint' | t)
+            }}
+          </p>
+        </div>
+
+        <span class="twofa-status" [class.enabled]="twoFaEnabled">
+          {{ twoFaEnabled ? ('settings.enabled' | t) : ('settings.disabled' | t) }}
+        </span>
+      </div>
+
+      <div class="alert error" *ngIf="twoFaError">
+        {{ twoFaError }}
+      </div>
+
+      <div class="alert success" *ngIf="msg">
+        {{ msg }}
+      </div>
+
+      <!-- OFF STATE -->
+      <div *ngIf="!twoFaEnabled && !twoFaQrDataUrl" class="twofa-action-box">
+        <h4>{{ 'settings.twoFactorSetup' | t }}</h4>
+        <p>{{ 'settings.twoFactorSetupIntro' | t }}</p>
+
+        <button class="btn primary" type="button" (click)="setup2FA()" [disabled]="twoFaLoading">
+          {{ 'settings.twoFactorSetup' | t }}
+        </button>
+      </div>
+
+      <!-- SETUP STATE -->
+      <div *ngIf="!twoFaEnabled && twoFaQrDataUrl" class="twofa-setup-grid">
+        <div class="qr-box">
+          <img [src]="twoFaQrDataUrl" alt="2FA QR code" />
+        </div>
+
+        <div class="setup-content">
+          <h4>{{ 'settings.twoFactorScanTitle' | t }}</h4>
+          <p>{{ 'settings.twoFactorSetupHint' | t }}</p>
+
+          <label>{{ 'settings.twoFactorSecret' | t }}</label>
+          <code class="secret-code">{{ twoFaSecret }}</code>
+
+          <label>{{ 'settings.twoFactorCode' | t }}</label>
+          <input
+            class="input"
+            [(ngModel)]="twoFaCode"
+            maxlength="6"
+            autocomplete="one-time-code"
+            inputmode="numeric"
+          />
+
+          <button
+            class="btn primary full-width"
+            type="button"
+            (click)="enable2FA()"
+            [disabled]="twoFaLoading || !twoFaCode"
+          >
+            {{ 'settings.twoFactorEnable' | t }}
+          </button>
+        </div>
+      </div>
+
+      <!-- BACKUP CODES DOWNLOAD ONLY -->
+      <div *ngIf="twoFaBackupCodes.length" class="backup-download-box">
+        <div>
+          <h4>{{ 'settings.twoFactorBackupCodesReady' | t }}</h4>
+          <p>{{ 'settings.twoFactorBackupCodesDownloadHint' | t }}</p>
+        </div>
+
+        <button class="btn primary" type="button" (click)="downloadBackupCodes()">
+          {{ 'settings.downloadBackupCodes' | t }}
+        </button>
+      </div>
+
+      <!-- ON STATE -->
+      <div *ngIf="twoFaEnabled" class="twofa-actions">
+        <div class="twofa-action-box">
+          <h4>{{ 'settings.twoFactorRegenerateBackupCodes' | t }}</h4>
+          <p>{{ 'settings.twoFactorRegenerateHint' | t }}</p>
+
+          <label>{{ 'settings.twoFactorCode' | t }}</label>
+          <input
+            class="input"
+            [(ngModel)]="twoFaRegenerateCode"
+            maxlength="6"
+            autocomplete="one-time-code"
+            inputmode="numeric"
+          />
+
+          <button
+            class="btn secondary full-width"
+            type="button"
+            (click)="regenerateBackupCodes()"
+            [disabled]="twoFaLoading || !twoFaRegenerateCode"
+          >
+            {{ 'settings.twoFactorRegenerateBackupCodes' | t }}
+          </button>
+        </div>
+
+        <div class="twofa-action-box danger-zone">
+          <h4>{{ 'settings.twoFactorDisable' | t }}</h4>
+          <p>{{ 'settings.twoFactorDisableHint' | t }}</p>
+
+          <label>{{ 'settings.twoFactorDisableCode' | t }}</label>
+          <input
+            class="input"
+            [(ngModel)]="twoFaDisableCode"
+            autocomplete="one-time-code"
+            inputmode="numeric"
+          />
+
+          <button
+            class="btn danger full-width"
+            type="button"
+            (click)="disable2FA()"
+            [disabled]="twoFaLoading || !twoFaDisableCode"
+          >
+            {{ 'settings.twoFactorDisable' | t }}
+          </button>
+        </div>
       </div>
     </div>
   </section>

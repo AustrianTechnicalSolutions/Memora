@@ -1,21 +1,23 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { GroupsService, GroupDetailDto, MemoryDto, AlbumDto, GroupStatsDto, GroupWeeklyActivityDto, GroupMemberActivityDto } from '../groups';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../translation/translate.pipe';
 import { AppLanguage, I18nService } from '../../translation/i18n.service';
 import { AuthService } from '../../user/auth.service';
+import { GuessGameComponent } from '../guess-game/guess-game';
+import { ChallengeNotificationComponent } from '../challenge-notification/challenge-notification';
 
 @Component({
   selector: 'app-group-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, GuessGameComponent, ChallengeNotificationComponent],
   templateUrl: './group-detail.html',
   styleUrls: ['./group-detail.css']
 })
-export class GroupDetailComponent {
+export class GroupDetailComponent implements OnInit, OnDestroy {
 
   groupId!: string;
   group?: GroupDetailDto;
@@ -74,6 +76,23 @@ export class GroupDetailComponent {
 
   currentUserId: string | null = null;
   isAdmin = false;
+  showGame = false;
+
+  // Duel
+  onlineMembers: { userId: string; name: string }[] = [];
+  pendingChallenge: { duelId: string; challengerName: string; memoryCount: number } | null = null;
+  showDuelGame = false;
+  activeDuelId: string | null = null;
+  activeDuelMemoryIds: string[] | null = null;
+  challengeSentTo: string | null = null;
+  private sentDuelId: string | null = null;
+
+  declinedByName: string | null = null;
+
+  private refreshTimer?: ReturnType<typeof setInterval>;
+  private heartbeatTimer?: ReturnType<typeof setInterval>;
+  private challengePollTimer?: ReturnType<typeof setInterval>;
+  private declinedMessageTimer?: ReturnType<typeof setTimeout>;
 
   constructor(
     private route: ActivatedRoute,
@@ -99,17 +118,138 @@ export class GroupDetailComponent {
           this.loadActivity();
           this.loadMemberActivity();
         },
-        error: (err) => console.error(err)
+        error: () => {}
       });
 
       this.loadAlbums();
+      this.startDuelTimers();
     });
 
     this.auth.currentUser().subscribe(u => {
       this.currentUserId = u.id;
+      // Re-check admin in case loadMembers() already ran (race condition)
+      this.isAdmin = this.members.some(m => m.userId === u.id && m.role === 'Admin');
     });
 
-    this.loadAlbums();
+    this.refreshTimer = setInterval(() => this.reload(), 30_000);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.refreshTimer);
+    clearInterval(this.heartbeatTimer);
+    clearInterval(this.challengePollTimer);
+    clearTimeout(this.declinedMessageTimer);
+  }
+
+  private startDuelTimers() {
+    // Clear any existing timers (route can re-fire if navigating between groups)
+    clearInterval(this.heartbeatTimer);
+    clearInterval(this.challengePollTimer);
+
+    this.sendHeartbeat();
+    this.pollOnlineMembers();
+    this.pollPendingChallenge();
+
+    this.heartbeatTimer = setInterval(() => {
+      this.sendHeartbeat();
+      this.pollOnlineMembers();
+    }, 30_000);
+
+    this.challengePollTimer = setInterval(() => {
+      this.pollPendingChallenge();
+      if (this.sentDuelId) this.pollSentDuel();
+    }, 3_000);
+  }
+
+  private sendHeartbeat() {
+    this.groupsService.duelHeartbeat(this.groupId).subscribe({ error: () => {} });
+  }
+
+  private pollOnlineMembers() {
+    this.groupsService.duelOnline(this.groupId).subscribe({
+      next: (r) => this.onlineMembers = r,
+      error: () => {}
+    });
+  }
+
+  private pollPendingChallenge() {
+    // Skip if game is active, challenge already displayed, or we sent a challenge (we're the challenger)
+    if (this.showDuelGame || this.pendingChallenge || this.sentDuelId) return;
+    this.groupsService.duelPending(this.groupId).subscribe({
+      next: (r) => this.pendingChallenge = r,
+      error: () => {}
+    });
+  }
+
+  isMemberOnline(userId: string): boolean {
+    return userId !== this.currentUserId && this.onlineMembers.some(m => m.userId === userId);
+  }
+
+  challengeMember(userId: string) {
+    const memoryIds = [...this.items]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10)
+      .map(m => m.id);
+    this.challengeSentTo = userId;
+    this.groupsService.duelChallenge(this.groupId, userId, memoryIds).subscribe({
+      next: (r) => { this.sentDuelId = r.duelId; },
+      error: () => { this.challengeSentTo = null; }
+    });
+  }
+
+  private pollSentDuel() {
+    if (!this.sentDuelId || this.showDuelGame) return;
+    this.groupsService.duelState(this.groupId, this.sentDuelId).subscribe({
+      next: (s) => {
+        if (s.status === 'active') {
+          this.activeDuelId = this.sentDuelId;
+          this.activeDuelMemoryIds = s.memoryIds;
+          this.sentDuelId = null;
+          this.challengeSentTo = null;
+          this.showDuelGame = true;
+        } else if (s.status === 'declined') {
+          const opponent = this.members.find(m => m.userId === this.challengeSentTo);
+          const name = opponent?.name ?? 'Opponent';
+          this.sentDuelId = null;
+          this.challengeSentTo = null;
+          clearTimeout(this.declinedMessageTimer);
+          this.declinedByName = name;
+          this.declinedMessageTimer = setTimeout(() => { this.declinedByName = null; }, 5000);
+        } else if (s.status === 'finished') {
+          this.sentDuelId = null;
+          this.challengeSentTo = null;
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  acceptChallenge() {
+    if (!this.pendingChallenge) return;
+    const duelId = this.pendingChallenge.duelId;
+    this.groupsService.duelAccept(this.groupId, duelId).subscribe({
+      next: (r) => {
+        this.activeDuelId = duelId;
+        this.activeDuelMemoryIds = r.memoryIds;
+        this.pendingChallenge = null;
+        this.showDuelGame = true;
+      },
+      error: () => {}
+    });
+  }
+
+  declineChallenge() {
+    if (!this.pendingChallenge) return;
+    this.groupsService.duelDecline(this.groupId, this.pendingChallenge.duelId).subscribe({ error: () => {} });
+    this.pendingChallenge = null;
+  }
+
+  onDuelGameClosed() {
+    this.showDuelGame = false;
+    this.activeDuelId = null;
+    this.activeDuelMemoryIds = null;
+    this.challengeSentTo = null;
+    this.sentDuelId = null;
   }
 
   reload() {
@@ -154,7 +294,7 @@ export class GroupDetailComponent {
 
       this.groupsService.createMemory(this.groupId, body).subscribe({
         next: () => this.afterCreate(),
-        error: (err) => console.error(err)
+        error: () => {}
       });
 
       return;
@@ -210,9 +350,8 @@ export class GroupDetailComponent {
 
         this.creatorName = this.group?.createdByUserName ?? 'Unknown';
 
-        const currentUserId = this.currentUserId;
         this.isAdmin = this.members.some(
-          m => m.userId === currentUserId && m.role === 'Admin'
+          m => m.userId === this.currentUserId && m.role === 'Admin'
         );
       },
       error: (err) => console.error(err)
@@ -229,7 +368,7 @@ export class GroupDetailComponent {
   loadActivity() {
     this.groupsService.weeklyActivity(this.groupId).subscribe({
       next: r => this.weeklyActivity = r,
-      error: err => console.error(err)
+      error: () => {}
     });
   }
 

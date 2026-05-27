@@ -209,16 +209,20 @@
 }
 
 .theme-toggle {
-  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
+  justify-content: space-between;
+
+  width: 100%;
+  min-height: 44px;
+  margin: 0 8px;
   padding: 10px 12px;
+
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: var(--bg-card);
+  background: linear-gradient(180deg, var(--bg-card), var(--bg-surface-alt));
   color: var(--text-primary);
+
   cursor: pointer;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -227,6 +231,11 @@
 .theme-toggle:hover {
   background: var(--hover-bg);
   border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.theme-toggle .label {
+  line-height: 1;
 }
 
 .switch {
@@ -265,7 +274,6 @@
 .stats-item {
   width: 100%;
   padding: 0 8px;
-  box-sizing: border-box;
   overflow: hidden;
 }
 
@@ -427,46 +435,102 @@
 }
 
 
+.hamburger-button {
+  display: none;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  .sidebar {
-    width: 80px;
-    padding: 12px 0;
+  .hamburger-button {
+    display: flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1200;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    transition: 
+      left 0.25s ease,
+      background 0.25s ease,
+      transform 0.25s ease;
   }
 
-  .nav-link {
-    padding: 10px 6px;
+  .hamburger-button.open {
+    left: 222px; /* inside 280px sidebar, near right edge */
+    background: var(--bg-card);
+  }
+
+  .sidebar {
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    padding: 16px 0 0;
+    align-items: stretch;
+    overflow-y: auto;
+  }
+
+  .sidebar-header {
+    padding-right: 64px;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.45);
+  }
+
+  .nav-link,
+  .user-button,
+  .logout-button {
+    width: 100%;
+  }
+
+  .label,
+  .logout-label {
+    display: inline;
   }
 
   .icon {
-    font-size: 20px;
+    font-size: 28px;
   }
 
   .user-button,
   .logout-button {
-    width: 40px;
-    height: 40px;
+    height: auto;
+    min-height: 44px;
   }
 
   .logout-button {
-    justify-content: center;
-    min-height: 40px;
-    padding: 0;
+    justify-content: flex-start;
+    padding: 10px 12px;
   }
 
-  .logout-button .logout-label {
-    display: none;
+  .groups-sublist {
+    margin: 8px 0 0 0;
+    padding: 0 8px;
   }
 
-  .user-avatar-placeholder {
-    width: 48px;
-    height: 48px;
-    font-size: 12px;
-  }
-
-  .settings-button {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
+  .group-link {
+    width: 100%;
+    padding: 8px 16px;
+    box-sizing: border-box;
   }
 }
-

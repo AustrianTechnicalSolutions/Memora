@@ -1,3 +1,13 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroSlide {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Page */
 .page {
   min-height: 100vh;
@@ -5,6 +15,7 @@
   color: var(--text-primary);
   padding: 28px;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  animation: fadeInUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Top nav */
@@ -36,9 +47,22 @@
   padding: 22px 26px;
   display: flex;
   justify-content: space-between;
+  animation: heroSlide 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
   align-items: center;
   gap: 16px;
   box-shadow: 0 20px 40px var(--shadow-strong);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.hero-card {
+  position: relative;
 }
 
 .hero-left {
@@ -75,6 +99,185 @@
   border-radius: 999px;
 }
 
+.hero-actions .hero-action {
+  min-width: auto;
+}
+
+.random-memory-backdrop {
+  z-index: 2100;
+}
+
+.random-memory-modal {
+  position: relative;
+  width: min(420px, calc(100vw - 32px));
+  border-radius: 28px;
+  padding: 28px 26px 24px;
+  background: radial-gradient(circle at top, color-mix(in srgb, var(--accent) 14%, var(--bg-surface) 86%), var(--bg-surface) 72%);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  box-shadow: 0 32px 100px color-mix(in srgb, var(--accent) 18%, transparent);
+  overflow: hidden;
+}
+
+.random-memory-body {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.random-memory-copy {
+  margin-top: 6px;
+  padding: 18px 18px 16px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--bg-surface) 82%, var(--accent) 18%);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+
+.random-memory-badge {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  color: var(--text-on-accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 30%, transparent);
+  animation: randomBadgeFloat 900ms ease-in-out infinite;
+}
+
+.random-memory-body h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.random-memory-body p {
+  margin: 10px 0 18px;
+  color: var(--text-subtle);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.random-memory-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  color: var(--text-primary);
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.random-memory-loading span {
+  display: inline-block;
+  opacity: 0.2;
+  animation: randomEllipsis 1.3s ease-in-out infinite;
+}
+
+.random-memory-loading span:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.random-memory-loading span:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+.random-memory-orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.random-memory-orbit span {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  animation: randomOrbit 2.8s linear infinite;
+}
+
+.random-memory-orbit span:nth-child(1) {
+  width: 220px;
+  height: 220px;
+  top: -38px;
+  left: -18px;
+}
+
+.random-memory-orbit span:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  top: 24px;
+  right: -36px;
+  animation-direction: reverse;
+}
+
+.random-memory-orbit span:nth-child(3) {
+  width: 90px;
+  height: 90px;
+  bottom: -20px;
+  left: 34%;
+  animation-duration: 2.1s;
+}
+
+.random-btn {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--border-strong));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bg-surface) 78%, var(--accent) 22%), color-mix(in srgb, var(--bg-surface-alt) 88%, var(--accent) 12%));
+  box-shadow: 0 0 0 0 transparent;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.random-btn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+  transform: translateX(-120%);
+  opacity: 0;
+}
+
+.random-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 65%, var(--border-strong));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.random-btn:hover:not(:disabled)::before {
+  opacity: 1;
+  animation: randomShimmer 900ms ease forwards;
+}
+
+.random-btn.is-preparing {
+  animation: randomPulse 700ms ease-in-out infinite;
+}
+
+.random-btn.is-preparing .random-btn-icon {
+  animation: randomSpin 700ms linear infinite;
+}
+
+.random-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.random-btn.is-preparing {
+  color: var(--text-primary);
+}
+
+.random-btn-icon {
+  display: inline-flex;
+  margin-right: 8px;
+  font-size: 15px;
+}
+
+.random-status {
+  display: none;
+}
+
 /* Buttons */
 .btn {
   min-width: 120px;
@@ -103,6 +306,47 @@
 
 .btn.primary:hover {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+}
+
+@keyframes randomPulse {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 26%, transparent);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+}
+
+@keyframes randomSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes randomShimmer {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+@keyframes randomDotPulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes randomBadgeFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+}
+
+@keyframes randomEllipsis {
+  0%, 100% { opacity: 0.15; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+@keyframes randomOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .btn.ghost {
@@ -489,11 +733,7 @@
 }
 
 .choice-card:hover {
-  background: var(--bg-card-strong);
-}
-
-.upload-box {
-  border: 2px dashed var(--border-strong);
+  background: rgba(255,255,255,0.06);
   border-radius: 18px;
   padding: 40px;
   text-align: center;
@@ -891,6 +1131,47 @@
   color: var(--text-primary);
 }
 
+/* Draw mode */
+.modal.draw-mode {
+  width: min(860px, 95vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.modal.draw-mode h2 {
+  padding: 16px 20px 0;
+}
+
+.modal.draw-mode .modal-close {
+  top: 12px;
+  right: 16px;
+}
+
+.draw-step {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.draw-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--bg-surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.btn.small {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
 /* Close button */
 .modal-close {
   color: var(--text-subtle);
@@ -941,6 +1222,23 @@
 @media (max-width: 700px) {
   .page {
     padding: 16px;
+  }
+
+  .hero-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .hero-action,
+  .random-btn,
+  .hero-actions .btn.primary {
+    width: 100%;
   }
 
   .wall {
@@ -1055,4 +1353,12 @@
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 4px;
+}
+
+.icon-btn.danger {
+  color: #b91c1c;
+}
+
+.icon-btn.danger:hover {
+  background: rgba(185, 28, 28, 0.08);
 }

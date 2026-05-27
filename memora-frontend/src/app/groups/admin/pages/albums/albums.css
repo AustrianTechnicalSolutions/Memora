@@ -1,6 +1,6 @@
 .ga-card {
-  background: #fff;
-  border: 1px solid #e6e6e6;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 14px;
   margin-bottom: 12px;
@@ -16,8 +16,10 @@
 
 .ga-form input {
   padding: 9px 10px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid var(--border);
   border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .ga-grid {
@@ -30,7 +32,7 @@
 .ga-pill {
   font-size: 12px;
   padding: 3px 8px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid var(--border);
   border-radius: 999px;
   opacity: 0.9;
 }

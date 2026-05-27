@@ -1,3 +1,18 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tileIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 .stats-page {
   min-height: 100vh;
   width: min(1180px, 100%);
@@ -6,6 +21,7 @@
   background: var(--bg-app);
   color: var(--text-primary);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  animation: fadeInUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* remove old purple aurora look */
@@ -19,10 +35,23 @@
   background: linear-gradient(135deg, var(--bg-surface), var(--bg-surface-alt));
   border: 1px solid var(--border);
   border-radius: 26px;
-  box-shadow: 0 20px 40px var(--shadow-strong);
+  box-shadow: 0 8px 32px var(--shadow-soft);
   position: relative;
   overflow: hidden;
+  animation: fadeInUp 0.45s ease both;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
+
+.glass-panel:hover,
+.glass-card:hover {
+  border-color: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 12px 40px var(--shadow-soft);
+}
+
+.glass-panel:nth-child(1) { animation-delay: 0.05s; }
+.glass-panel:nth-child(2) { animation-delay: 0.10s; }
+.glass-panel:nth-child(3) { animation-delay: 0.15s; }
+.glass-panel:nth-child(4) { animation-delay: 0.20s; }
 
 .glass-panel::after,
 .glass-card::after {
@@ -57,8 +86,12 @@
   margin: 0;
   font-size: clamp(32px, 5vw, 56px);
   line-height: 1;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent) 110%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subline {
@@ -283,7 +316,23 @@
   padding: 18px;
   border-radius: 22px;
   background: var(--bg-surface-alt);
+  border: 1px solid var(--border);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  animation: tileIn 0.4s ease both;
 }
+
+.tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(168, 85, 247, 0.28);
+  box-shadow: 0 8px 28px var(--shadow-soft), 0 0 18px rgba(168, 85, 247, 0.08);
+}
+
+.tile:nth-child(1) { animation-delay: 0.06s; }
+.tile:nth-child(2) { animation-delay: 0.12s; }
+.tile:nth-child(3) { animation-delay: 0.18s; }
+.tile:nth-child(4) { animation-delay: 0.24s; }
+.tile:nth-child(5) { animation-delay: 0.30s; }
+.tile:nth-child(6) { animation-delay: 0.36s; }
 
 .tile.primary,
 .tile.accent {
@@ -375,6 +424,8 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transform-origin: left;
+  animation: barGrow 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 }
 
 .bar-value {

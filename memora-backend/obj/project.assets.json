@@ -2952,11 +2952,16 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
     "/home/nico/.nuget/packages/": {}
+=======
+    "C:\\Users\\gajip\\.nuget\\packages\\": {}
+>>>>>>> origin/main
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "/home/nico/Documents/Memora/memora-backend/memora-backend.csproj",
       "projectName": "memora-backend",
       "projectPath": "/home/nico/Documents/Memora/memora-backend/memora-backend.csproj",
@@ -2965,11 +2970,26 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/nico/.nuget/NuGet/NuGet.Config"
+=======
+      "projectUniqueName": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\memora\\memora-backend\\memora-backend.csproj",
+      "projectName": "memora-backend",
+      "projectPath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\memora\\memora-backend\\memora-backend.csproj",
+      "packagesPath": "C:\\Users\\gajip\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\memora\\memora-backend\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\gajip\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+>>>>>>> origin/main
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+<<<<<<< HEAD
+=======
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+>>>>>>> origin/main
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

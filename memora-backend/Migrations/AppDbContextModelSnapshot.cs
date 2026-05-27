@@ -117,6 +117,9 @@ namespace memorabackend.Migrations
                     b.Property<string>("TikTokUrl")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("TwoFactorBackupCodesJson")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("INTEGER");
 

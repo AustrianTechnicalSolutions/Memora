@@ -11,8 +11,9 @@
 button {
   padding: 9px 12px;
   border-radius: 10px;
-  border: 1px solid #e6e6e6;
-  background: #fff;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
   cursor: pointer;
 }
-button:hover { background: #fafafa; }
+button:hover { background: var(--bg-surface-alt); }

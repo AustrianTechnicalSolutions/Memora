@@ -1,5 +1,49 @@
 <div class="ga-shell">
   <aside class="ga-sidebar">
+    <div class="ga-brand" *ngIf="group">
+      <div class="ga-title">{{ group.name }}</div>
+      <div class="ga-subtitle">Admin-Panel</div>
+      <div class="ga-meta">
+        <span class="ga-chip">{{ group.memberCount }} Mitglieder</span>
+      </div>
+    </div>
+
+    <nav class="ga-nav">
+      <a
+        [routerLink]="['/groups', groupId, 'admin', 'dashboard']"
+        routerLinkActive="active"
+      >
+        📊 Dashboard
+      </a>
+      <a
+        [routerLink]="['/groups', groupId, 'admin', 'members']"
+        routerLinkActive="active"
+      >
+        👥 Mitglieder
+      </a>
+      <a
+        [routerLink]="['/groups', groupId, 'admin', 'albums']"
+        routerLinkActive="active"
+      >
+        🗂 Alben
+      </a>
+      <a
+        [routerLink]="['/groups', groupId, 'admin', 'settings']"
+        routerLinkActive="active"
+      >
+        ⚙️ Einstellungen
+      </a>
+      <a
+        [routerLink]="['/groups', groupId, 'admin', 'moderation']"
+        routerLinkActive="active"
+      >
+        🛡 Moderation
+      </a>
+    </nav>
+
+    <div class="ga-back">
+      <a [routerLink]="['/groups', groupId]" class="ga-back-link">← Zurück zur Gruppe</a>
+    </div>
   </aside>
 
   <main class="ga-main">

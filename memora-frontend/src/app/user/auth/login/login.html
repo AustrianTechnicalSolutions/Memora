@@ -2,32 +2,61 @@
   <div class="auth-card">
     <h2>{{ 'auth.login.title' | t }} 👋</h2>
 
-    <input
-      type="email"
-      [placeholder]="'auth.email' | t"
-      [(ngModel)]="email"
-    />
+    <!-- STEP 1: email/password -->
+    <ng-container *ngIf="!show2fa">
+      <input
+        type="email"
+        [placeholder]="'auth.email' | t"
+        [(ngModel)]="email"
+      />
 
-    <input
-      type="password"
-      [placeholder]="'auth.password' | t"
-      [(ngModel)]="password"
-    />
+      <input
+        type="password"
+        [placeholder]="'auth.password' | t"
+        [(ngModel)]="password"
+      />
 
-    <div *ngIf="show2fa">
-      <label>{{ 'auth.login.twoFactor' | t }}</label>
-      <input type="text" [(ngModel)]="twoFactorCode" placeholder="123456" maxlength="6" />
-    </div>
+      <button (click)="login()">
+        {{ 'auth.login.button' | t }}
+      </button>
+    </ng-container>
+
+    <!-- STEP 2: 2FA -->
+    <ng-container *ngIf="show2fa">
+      <div class="twofa-step">
+        <p class="hint">
+          {{ 'auth.login.twoFactorHelp' | t }}
+        </p>
+
+        <h3 class="twofa-title">
+          {{ 'auth.login.twoFactor' | t }}
+        </h3>
+
+        <input
+          type="text"
+          [(ngModel)]="twoFactorCode"
+          [placeholder]="'auth.login.twoFactorPlaceholder' | t"
+          autocomplete="one-time-code"
+          inputmode="text"
+          maxlength="20"
+          (keyup.enter)="login()"
+        />
+
+        <div class="twofa-buttons">
+          <button class="btn primary" (click)="login()" [disabled]="!twoFactorCode.trim()">
+            {{ 'auth.login.verifyTwoFactor' | t }}
+          </button>
+
+          <button class="btn ghost" type="button" (click)="backToLogin()">
+            {{ 'auth.login.backToLogin' | t }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
 
     <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
 
-    <button (click)="login()">{{ 'auth.login.button' | t }}</button>
-
-    <p *ngIf="error" class="error error-inline">
-      {{ error }}
-    </p>
-
-    <p>
+    <p *ngIf="!show2fa">
       {{ 'auth.login.noAccount' | t }}
       <a routerLink="/register">{{ 'auth.login.register' | t }}</a>
     </p>

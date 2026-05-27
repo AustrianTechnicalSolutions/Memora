@@ -44,7 +44,8 @@ export class SettingsComponent {
 
   password = {
     currentPassword: '',
-    newPassword: ''
+    newPassword: '',
+    twoFactorCode: ''
   };
 
   // ===== 2FA UI state =====
@@ -54,6 +55,12 @@ export class SettingsComponent {
   twoFaOtpAuthUrl = '';
   twoFaQrDataUrl = '';
   twoFaCode = '';
+
+  twoFaDisableCode = '';
+  twoFaBackupCodes: string[] = [];
+  twoFaRegenerateCode = '';
+
+  twoFaError = '';
 
   constructor(
     private http: HttpClient,
@@ -109,6 +116,7 @@ export class SettingsComponent {
   clearMessages() {
     this.msg = '';
     this.err = '';
+    this.twoFaError = '';
   }
 
   saveProfile() {
@@ -149,11 +157,20 @@ export class SettingsComponent {
     this.saving = true;
     this.clearMessages();
 
-    this.http.put(`${this.api}/password`, this.password).subscribe({
+    const body: any = {
+      currentPassword: this.password.currentPassword,
+      newPassword: this.password.newPassword,
+    };
+    if (this.twoFaEnabled && this.password.twoFactorCode) {
+      body.twoFactorCode = this.password.twoFactorCode;
+    }
+
+    this.http.put(`${this.api}/password`, body).subscribe({
       next: () => {
         this.msg = this.i18n.translate('settings.passwordChanged');
         this.password.currentPassword = '';
         this.password.newPassword = '';
+        this.password.twoFactorCode = '';
         this.saving = false;
       },
       error: (e) => {
@@ -202,42 +219,99 @@ export class SettingsComponent {
     this.clearMessages();
 
     this.twoFactor.enable(code).subscribe({
-      next: () => {
+      next: (res) => {
         this.twoFaEnabled = true;
-        this.twoFaLoading = false;
-        this.msg = this.i18n.translate('settings.twoFactorEnabled');
-      },
-      error: (e) => {
-        console.error(e);
-        this.err = e?.error ?? this.i18n.translate('settings.twoFactorInvalid');
-        this.twoFaLoading = false;
-      }
-    });
-  }
+        this.twoFaBackupCodes = res.backupCodes ?? [];
 
-  disable2FA() {
-    this.twoFaLoading = true;
-    this.clearMessages();
-
-    this.twoFactor.disable().subscribe({
-      next: () => {
-        this.twoFaEnabled = false;
-
-        // clear UI
         this.twoFaSecret = '';
         this.twoFaOtpAuthUrl = '';
         this.twoFaQrDataUrl = '';
         this.twoFaCode = '';
 
         this.twoFaLoading = false;
+        this.msg = this.i18n.translate('settings.twoFactorEnabled');
+      },
+      error: (e) => {
+        console.error(e);
+        this.setTwoFaError(e, 'settings.twoFactorInvalid');
+        this.twoFaLoading = false;
+      }
+    });
+  }
+
+  disable2FA() {
+    const code = this.twoFaDisableCode.trim();
+    if (!code) return;
+
+    this.twoFaLoading = true;
+    this.clearMessages();
+
+    this.twoFactor.disable(code).subscribe({
+      next: () => {
+        this.twoFaEnabled = false;
+
+        this.twoFaSecret = '';
+        this.twoFaOtpAuthUrl = '';
+        this.twoFaQrDataUrl = '';
+        this.twoFaCode = '';
+        this.twoFaDisableCode = '';
+        this.twoFaBackupCodes = [];
+
+        this.twoFaLoading = false;
         this.msg = this.i18n.translate('settings.twoFactorDisabled');
       },
       error: (e) => {
         console.error(e);
-        this.err = this.i18n.translate('settings.twoFactorDisableFailed');
+        this.setTwoFaError(e, 'settings.twoFactorInvalid');
         this.twoFaLoading = false;
       }
     });
+  }
+
+  regenerateBackupCodes() {
+    const code = this.twoFaRegenerateCode.trim();
+    if (!code) return;
+
+    this.twoFaLoading = true;
+    this.clearMessages();
+
+    this.twoFactor.regenerateBackupCodes(code).subscribe({
+      next: (res) => {
+        this.twoFaBackupCodes = res.backupCodes ?? [];
+        this.twoFaRegenerateCode = '';
+        this.twoFaLoading = false;
+        this.msg = this.i18n.translate('settings.twoFactorBackupCodesGenerated');
+      },
+      error: (e) => {
+        console.error(e);
+        this.setTwoFaError(e, 'settings.twoFactorInvalid');
+        this.twoFaLoading = false;
+      }
+    });
+  }
+
+  downloadBackupCodes() {
+    if (!this.twoFaBackupCodes.length) return;
+
+    const content = [
+      'Memory backup codes',
+      '',
+      'Store these somewhere safe. Each code can only be used once.',
+      '',
+      ...this.twoFaBackupCodes
+    ].join('\n');
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'memora-backup-codes.txt';
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    this.twoFaBackupCodes = [];
   }
 
   // Profile image
@@ -262,5 +336,12 @@ export class SettingsComponent {
 
   removeProfileImage() {
     this.profile.profileImageUrl = '';
+  }
+
+  private setTwoFaError(e: any, fallbackKey: string) {
+    this.twoFaError =
+      e?.error?.message ??
+      e?.error ??
+      this.i18n.translate(fallbackKey);
   }
 }

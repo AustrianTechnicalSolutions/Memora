@@ -20,6 +20,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   userProfileImageUrl: string | null = null;
   currentUser: CurrentUser | null = null;
   groups: GroupListItemDto[] = [];
+  sidebarOpen = false;
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,8 @@ import { GroupsService, GroupListItemDto } from '../groups';
 import { TranslatePipe } from '../../translation/translate.pipe';
 import { I18nService } from '../../translation/i18n.service';
 
+const REFRESH_INTERVAL_MS = 30_000;
+
 @Component({
   selector: 'app-groups-page',
   standalone: true,
@@ -14,19 +16,22 @@ import { I18nService } from '../../translation/i18n.service';
   templateUrl: './groups-page.html',
   styleUrls: ['./groups-page.css']
 })
-export class GroupsPageComponent {
+export class GroupsPageComponent implements OnDestroy {
   groups: GroupListItemDto[] = [];
   loading = true;
 
-  // create group form
+  searchQuery = '';
+
   newGroupName = '';
   creating = false;
   errorMsg = '';
 
-  // join group from
-  inviteCode = ''
+  inviteCode = '';
   joining = false;
   joinErrorMsg = '';
+  joinSuccessMsg = '';
+
+  private refreshTimer?: ReturnType<typeof setInterval>;
 
   constructor(
     private groupsService: GroupsService,
@@ -35,6 +40,17 @@ export class GroupsPageComponent {
 
   ngOnInit() {
     this.loadGroups();
+    this.refreshTimer = setInterval(() => this.loadGroups(), REFRESH_INTERVAL_MS);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.refreshTimer);
+  }
+
+  get filteredGroups(): GroupListItemDto[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return this.groups;
+    return this.groups.filter(g => g.name.toLowerCase().includes(q));
   }
 
   loadGroups() {
@@ -62,7 +78,7 @@ export class GroupsPageComponent {
       next: () => {
         this.newGroupName = '';
         this.creating = false;
-        this.loadGroups(); // refresh list
+        this.loadGroups();
       },
       error: (err) => {
         console.error(err);
@@ -78,11 +94,13 @@ export class GroupsPageComponent {
 
     this.joining = true;
     this.joinErrorMsg = '';
+    this.joinSuccessMsg = '';
 
     this.groupsService.joinGroup(code).subscribe({
       next: () => {
         this.inviteCode = '';
         this.joining = false;
+        this.joinSuccessMsg = 'Erfolgreich beigetreten!';
         this.loadGroups();
       },
       error: (err) => {

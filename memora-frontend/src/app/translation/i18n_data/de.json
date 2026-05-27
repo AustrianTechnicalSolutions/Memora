@@ -42,7 +42,11 @@
             "twoFactorHelp": "Gib deinen 2FA-Code aus Microsoft Authenticator ein.",
             "twoFactorInvalid": "Ungültiger 2FA-Code.",
             "failed": "Email oder Password ist Falsch.",
-            "rateLimited": "Zu viele Versuche. Bitte später erneut versuchen"
+            "rateLimited": "Zu viele Versuche. Bitte später erneut versuchen",
+
+            "twoFactorPlaceholder": "123456 oder Backup-Code",
+            "verifyTwoFactor": "Code bestätigen",
+            "backToLogin": "Zurück zum Login"
         },
         "register": {
             "title": "Konto erstellen",
@@ -119,12 +123,41 @@
         "passwordChangeFailed": "Passwort konnte nicht geändert werden.",
         "profileLoadFailed": "Profil konnte nicht geladen werden.",
         "selectImage": "Bitte wähle eine Bilddatei aus.",
-        "twoFactorSetupHint": "Scanne den QR-Code mit Microsoft Authenticator und gib danach den 6-stelligen Code ein.",
-        "twoFactorSetupFailed": "2FA-Setup konnte nicht gestartet werden.",
+        "2fa": "Zwei Faktor Authentifizierung",
+        "twoFactorTitle": "Zwei-Faktor-Authentifizierung",
+        "twoFactorDisabledHint": "Schütze dein Konto mit einer Authenticator-App.",
+        "twoFactorEnabledHint": "Dein Konto ist durch Zwei-Faktor-Authentifizierung geschützt.",
+
+        "twoFactorSetup": "2FA einrichten",
+        "twoFactorSetupHint": "Scanne den QR-Code mit Microsoft Authenticator, Google Authenticator oder Authy und gib anschließend den 6-stelligen Code ein.",
+        "twoFactorSetupFailed": "2FA-Einrichtung konnte nicht gestartet werden.",
+
+        "twoFactorSecret": "Manueller Einrichtungsschlüssel",
+        "twoFactorCode": "Authentifizierungscode",
+
+        "twoFactorEnable": "2FA aktivieren",
         "twoFactorEnabled": "2FA erfolgreich aktiviert.",
         "twoFactorInvalid": "Ungültiger 2FA-Code.",
+
+        "twoFactorBackupCodes": "Backup-Codes",
+        "twoFactorBackupCodesHint": "Bewahre diese Backup-Codes sicher auf. Jeder Code kann nur einmal verwendet werden.",
+        "twoFactorBackupCodesGenerated": "Backup-Codes erfolgreich neu erstellt.",
+        "twoFactorRegenerateBackupCodes": "Backup-Codes neu generieren",
+
+        "twoFactorDisable": "2FA deaktivieren",
+        "twoFactorDisableCode": "Authentifizierungscode eingeben",
         "twoFactorDisabled": "2FA deaktiviert.",
-        "twoFactorDisableFailed": "2FA konnte nicht deaktiviert werden."
+        "twoFactorDisableFailed": "2FA konnte nicht deaktiviert werden.",
+
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "twoFactorSetupIntro": "Verwende eine Authenticator-App, um dein Konto zusätzlich zu schützen.",
+        "twoFactorScanTitle": "QR-Code scannen",
+        "twoFactorBackupCodesReady": "Backup-Codes bereit",
+        "twoFactorBackupCodesDownloadHint": "Lade deine Backup-Codes jetzt herunter. Aus Sicherheitsgründen werden sie auf dieser Seite nicht angezeigt.",
+        "downloadBackupCodes": "Backup-Codes herunterladen",
+        "twoFactorRegenerateHint": "Erstelle neue Backup-Codes. Deine alten Backup-Codes funktionieren danach nicht mehr.",
+        "twoFactorDisableHint": "Gib deinen aktuellen Authenticator- oder Backup- ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren."
     },
     "stats": {
         "eyebrow": "Memora Analytics",
@@ -235,7 +268,9 @@
         "reply": "Antworten",
         "cancel": "Abbrechen",
         "replyingTo": "Antwort an {name}",
-        "unknownUser": "Unbekannt"
+        "unknownUser": "Unbekannt",
+        "draw": "Zeichnen",
+        "addDrawing": "Zeichnung hinzufügen"
     },
     "group": {
         "inviteCode": "Einladungscode",
@@ -270,12 +305,29 @@
         "firstAlbum": "Erstes Album hinzugefügt",
         "comingSoon": "Kommt bald"
     },
+    "duel": {
+        "challenged": "Du wurdest herausgefordert!",
+        "challengedBy": "{name} fordert dich zum Memory-Duell heraus.",
+        "accept": "Annehmen",
+        "decline": "Ablehnen",
+        "challenge": "Herausfordern",
+        "online": "Online",
+        "youWon": "Du hast gewonnen!",
+        "opponentWon": "Gegner hat gewonnen.",
+        "tie": "Unentschieden!",
+        "you": "Du",
+        "opponent": "Gegner",
+        "waitingOpponent": "Warte auf Gegner...",
+        "declined": "{name} hat deine Herausforderung abgelehnt.",
+        "opponentQuit": "Dein Gegner hat das Spiel verlassen."
+    },
     "impressum": {
         "provider": "Anbieter",
         "representedBy": "Vertreten durch",
         "contact": "Kontakt",
         "liability": "Haftungshinweis",
-        "liabilityText": "Trotz sorgfältiger Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links."
+        "liabilityText": "Trotz sorgfältiger Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links.",
+        "subtitle": "Informationen über das Team hinter Memora."
     },
     "admin": {
         "groupAdmin": "Gruppen-Admin",

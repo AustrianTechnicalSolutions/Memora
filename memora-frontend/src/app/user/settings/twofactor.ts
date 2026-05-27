@@ -7,6 +7,10 @@ export interface TwoFactorSetupResponse {
     otpauthUrl: string;
 }
 
+export interface TwoFactorEnableResponse {
+    backupCodes: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class TwoFactorService {
     private api = `${environment.apiUrl}/api/2fa`;
@@ -18,10 +22,14 @@ export class TwoFactorService {
     }
 
     enable(code: string) {
-        return this.http.post(`${this.api}/enable`, { code });
+        return this.http.post<TwoFactorEnableResponse>(`${this.api}/enable`, { code });
     }
 
-    disable() {
-        return this.http.post(`${this.api}/disable`, {});
+    disable(code: string) {
+        return this.http.post(`${this.api}/disable`, { code });
+    }
+
+    regenerateBackupCodes(code: string) {
+        return this.http.post<{ backupCodes: string[] }>(`${this.api}/backup-codes`, { code });
     }
 }

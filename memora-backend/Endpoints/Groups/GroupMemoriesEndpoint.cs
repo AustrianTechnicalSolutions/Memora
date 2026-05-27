@@ -179,6 +179,52 @@ public class GroupMemoriesController : BaseApiController
         ));
     }
 
+    [HttpDelete("{memoryId:guid}")]
+    public async Task<IActionResult> DeleteMemory(Guid groupId, Guid memoryId)
+    {
+        var uid = User.UserId();
+
+        await EnsureGroupMember(_db, groupId, uid);
+
+        var memory = await _db.Set<Memory>()
+            .Include(x => x.Tags)
+            .Include(x => x.People)
+            .FirstOrDefaultAsync(x => x.Id == memoryId && x.GroupId == groupId);
+
+        if (memory == null)
+            throw new ApiException("not_found", "Memory not found.", 404);
+
+        var isCreator = memory.CreatedByUserId == uid;
+
+        var isAdmin = await _db.Set<GroupMember>()
+            .AnyAsync(x =>
+                x.GroupId == groupId &&
+                x.UserId == uid &&
+                x.Role == GroupRole.Admin);
+
+        if (!isCreator && !isAdmin)
+            throw new ApiException("forbidden", "You are not allowed to delete this memory.", 403);
+
+        if (!string.IsNullOrWhiteSpace(memory.MediaUrl))
+        {
+            var webRootPath = _environment.WebRootPath
+                ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+
+            var uploadsFolder = Path.Combine(webRootPath, "uploads");
+            var fileName = Path.GetFileName(memory.MediaUrl);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        _db.Remove(memory);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 
     [HttpPost("upload")]
     [RequestSizeLimit(200_000_000)] // 200MB limit
