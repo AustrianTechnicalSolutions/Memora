@@ -30,4 +30,3 @@ jobs:
           script: |
             cd /home/nico/Documents/Memora
             bash deploy.sh
-            echo "DEPLOY_DONE"
