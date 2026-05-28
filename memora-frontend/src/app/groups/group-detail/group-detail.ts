@@ -77,6 +77,7 @@ export class GroupDetailComponent implements OnInit, OnDestroy {
   currentUserId: string | null = null;
   isAdmin = false;
   showGame = false;
+  featureLocked = false;
 
   // Duel
   onlineMembers: { userId: string; name: string }[] = [];
@@ -383,6 +384,16 @@ export class GroupDetailComponent implements OnInit, OnDestroy {
         this.topQuoteUserId = r.reduce((a, b) => a.quoteCount > b.quoteCount ? a : b).userId;
       }
     });
+  }
+
+  onOpenGuess() {
+    if (this.members.length < 4) {
+      this.featureLocked = true;
+      setTimeout(() => { this.featureLocked = false; }, 3000);
+      return;
+    }
+
+    this.showGame = true;
   }
 
   // Tagging
