@@ -27,6 +27,8 @@ export class AlbumsComponent implements OnInit, OnDestroy {
   error?: string;
 
   albums: AlbumDto[] = [];
+  pendingDeleteAlbum: AlbumDto | null = null;
+  deletingAlbum = false;
 
   form;
 
@@ -91,6 +93,42 @@ export class AlbumsComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error(err);
           this.error = 'Album konnte nicht erstellt werden.';
+        }
+      })
+    );
+  }
+
+  canDeleteAlbum(album: AlbumDto): boolean {
+    return album.id !== 'all' && album.title.trim().toLowerCase() !== 'all memories';
+  }
+
+  openDeleteAlbumModal(album: AlbumDto): void {
+    if (!this.canDeleteAlbum(album)) return;
+    this.pendingDeleteAlbum = album;
+  }
+
+  closeDeleteAlbumModal(): void {
+    if (this.deletingAlbum) return;
+    this.pendingDeleteAlbum = null;
+  }
+
+  confirmDeleteAlbum(): void {
+    if (!this.pendingDeleteAlbum || this.deletingAlbum) return;
+
+    const album = this.pendingDeleteAlbum;
+    this.deletingAlbum = true;
+
+    this.sub.add(
+      this.service.deleteAlbum(this.groupId, album.id).subscribe({
+        next: () => {
+          this.deletingAlbum = false;
+          this.pendingDeleteAlbum = null;
+          this.load();
+        },
+        error: (err) => {
+          console.error(err);
+          this.deletingAlbum = false;
+          this.error = 'Album konnte nicht gelöscht werden.';
         }
       })
     );

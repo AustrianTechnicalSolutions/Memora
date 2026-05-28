@@ -50,11 +50,8 @@ export class OverviewSidebarComponent implements OnInit {
       }
 
       const own = memories.filter((m) => m.createdByUserId === userId);
-      const quoteCount = own.filter((m) => m.type === 2).length;
-      const postCount = own.length;
-
-      this.totalMemories = postCount;
-      this.totalLikes = postCount === 0 ? 0 : Math.round(postCount * 1.8 + quoteCount * 0.7 + 9);
+      this.totalMemories = own.length;
+      this.totalLikes = memories.reduce((sum, m) => sum + (m.likeCount ?? 0), 0);
     });
   }
 
