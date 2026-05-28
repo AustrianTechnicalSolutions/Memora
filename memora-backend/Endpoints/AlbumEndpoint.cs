@@ -80,6 +80,41 @@ public class AlbumEndpoint : BaseApiController
         ));
     }
 
+    [HttpDelete("{albumId:guid}")]
+    public async Task<IActionResult> DeleteAlbum(Guid groupId, Guid albumId)
+    {
+        var uid = User.UserId();
+
+        var album = await _db.Set<Album>()
+            .FirstOrDefaultAsync(a => a.Id == albumId && a.GroupId == groupId);
+
+        if (album == null) return NotFound();
+        if (!await CanEditAlbum(albumId, uid)) return Forbid();
+
+        var memories = await _db.Set<Memory>()
+            .Where(m => m.GroupId == groupId && m.AlbumId == albumId)
+            .ToListAsync();
+
+        foreach (var memory in memories)
+        {
+            memory.AlbumId = null;
+        }
+
+        var albumPeople = await _db.Set<AlbumPerson>()
+            .Where(p => p.AlbumId == albumId)
+            .ToListAsync();
+
+        if (albumPeople.Count > 0)
+        {
+            _db.RemoveRange(albumPeople);
+        }
+
+        _db.Remove(album);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
     [HttpGet("{albumId:guid}/people")]
     public async Task<ActionResult<List<GroupMemberDto>>> AlbumPeople(Guid groupId, Guid albumId)
     {

@@ -35,6 +35,28 @@
         <span *ngIf="a.dateEnd">→ {{ a.dateEnd | date:'mediumDate' }}</span>
       </div>
       <div class="ga-note small">AlbumId: {{ a.id }}</div>
+
+      <div class="ga-actions" *ngIf="canDeleteAlbum(a)">
+        <button class="ga-danger" type="button" (click)="openDeleteAlbumModal(a)">
+          Delete album
+        </button>
+      </div>
     </section>
+  </div>
+
+  <div class="ga-modal-backdrop" *ngIf="pendingDeleteAlbum as album" (click)="closeDeleteAlbumModal()">
+    <div class="ga-modal" (click)="$event.stopPropagation()">
+      <h3>Delete album?</h3>
+      <p>
+        Are you sure you want to delete <strong>{{ album.title }}</strong>? Memories stay in the group and will move to All memories.
+      </p>
+
+      <div class="ga-modal-actions">
+        <button type="button" (click)="closeDeleteAlbumModal()" [disabled]="deletingAlbum">Cancel</button>
+        <button class="ga-danger" type="button" (click)="confirmDeleteAlbum()" [disabled]="deletingAlbum">
+          {{ deletingAlbum ? 'Deleting...' : 'Delete' }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>
