@@ -39,3 +39,57 @@
 
 .ga-meta { margin-top: 8px; display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; opacity: 0.8; }
 .ga-note.small { font-size: 12px; opacity: 0.8; margin-top: 6px; }
+
+.ga-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ga-danger {
+  background: #7f1d1d;
+  color: #fff;
+  border: 1px solid #991b1b;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.ga-danger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ga-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.ga-modal {
+  width: min(460px, 92vw);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.ga-modal h3 {
+  margin: 0 0 10px;
+}
+
+.ga-modal p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.ga-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}

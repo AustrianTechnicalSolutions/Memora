@@ -192,6 +192,10 @@ export class GroupAdminService {
     return this.http.post<AlbumDto>(`${this.base}/${groupId}/albums`, body);
   }
 
+  deleteAlbum(groupId: string, albumId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${groupId}/albums/${albumId}`);
+  }
+
   // ===== Settings ======
   renameGroup(groupId: string, name: string): Observable<GroupDetailDto> {
     return this.http.patch<GroupDetailDto>(`${this.base}/${groupId}`, { name }).pipe(

@@ -61,7 +61,7 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "host": "0.0.0.0",
-            "allowedHosts": ["memora.austrianms.at"]
+            "allowedHosts": ["memora.austriants.at"]
           },
           "configurations": {
             "production": {
