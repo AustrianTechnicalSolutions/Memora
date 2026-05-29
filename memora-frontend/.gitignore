@@ -33,6 +33,7 @@ yarn-error.log
 /connect.lock
 /coverage
 /libpeerconnection.log
+/dist
 testem.log
 /typings
 __screenshots__/

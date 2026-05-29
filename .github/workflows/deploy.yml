@@ -1,0 +1,32 @@
+name: Deploy to Raspberry PI
+
+on:
+  push:
+    branches:
+      - feature/hosting
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Check Tailscale
+        run: |
+          tailscale status
+          tailscale ping ${{ secrets.PI_HOST }}
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USER }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          command_timeout: 20m
+          script: |
+            cd /home/nico/Documents/Memora
+            bash deploy.sh

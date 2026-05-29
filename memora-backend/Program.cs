@@ -129,7 +129,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("frontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:4200", "https://austrianms.at", "https://www.austrianms.at", "https://memora.austrianms.at")
+            .WithOrigins("http://localhost:4200", "https://austriants.at", "https://www.austriants.at", "https://memora.austriants.at")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
@@ -146,9 +146,12 @@ Directory.CreateDirectory(uploadsPath);
 app.UseCors("frontend");          // must be first so ALL responses get CORS headers
 
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseRateLimiter();
 
 app.UseHttpsRedirection();
+
+app.UseCors("frontend");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
