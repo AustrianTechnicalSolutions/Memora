@@ -2,6 +2,6 @@
 /obj
 /node_modules
 /wwwroot
-memora.db
+*.db
 memora.db-shm
 memora.db-wal
