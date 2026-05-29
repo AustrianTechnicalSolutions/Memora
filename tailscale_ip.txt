@@ -10,3 +10,166 @@ restart frontend on pi
 rm -rf .angular/cache dist
 npm run build
 sudo systemctl restart <your-frontend-service>
+
+
+other pi
+100.75.213.86
+
+
+
+
+Guide für Nico weil er behindert ist
+ALLES von Memora läuft auf dem 100.96.250.70 rasp 4 Pi
+
+Für die austrian.ts AustrianTS Home page:
+cd ~/Documents/AustrianTS
+npm install
+ng build --configuration production
+
+der build ist unter /var/www/austriants damit nginx funktioniert!
+sudo mkdir -p /var/www/austriants
+sudo rm -rf /var/www/austriants/*
+sudo cp -r dist/*/browser/* /var/www/austriants/
+
+
+Das normale Memora:
+cd ~/Documents/Memora/memora-frontend
+npm install
+ng build --configuration production
+
+sudo mkdir -p /var/www/memora
+sudo rm -rf /var/www/memora/*
+sudo cp -r dist/*/browser/* /var/www/memora/
+
+backend:
+cd ~/Documents/Memora/memora-backend
+dotnet publish -c Release
+
+
+
+
+Nginx config:
+sudo micro /etc/nginx/sites-available/austriants
+
+server {
+    listen 80;
+    server_name austriants.at;
+
+    root /var/www/austriants;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+
+
+sudo micro /etc/nginx/sites-available/memora
+
+server {
+    listen 80;
+    server_name memora.austriants.at;
+
+    root /var/www/memora;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+
+
+
+sudo micro /etc/nginx/sites-available/memora-api
+
+server {
+    listen 80;
+    server_name api.austriants.at;
+
+    location / {
+        proxy_pass http://localhost:5000;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+
+Enable the sites:
+sudo rm -f /etc/nginx/sites-enabled/default
+
+sudo ln -s /etc/nginx/sites-available/austriants /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/memora /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/memora-api /etc/nginx/sites-enabled/
+
+sudo nginx -t
+sudo systemctl reload nginx
+
+
+
+
+Fürs backend:
+sudo micro /etc/systemd/system/memora-api.service
+
+[Unit]
+Description=Memora API
+After=network.target
+
+[Service]
+User=nico
+WorkingDirectory=/home/nico/Documents/Memora/memora-backend
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5000
+ExecStart=/usr/bin/dotnet /home/nico/Documents/Memora/memora-backend/bin/Release/net9.0/publish/YOUR_BACKEND.dll
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable memora-api
+sudo systemctl start memora-api
+sudo systemctl status memora-api
+
+
+
+Cloudflare:
+cloudflared tunnel login
+micro ~/.cloudflared/config.yml
+
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /home/nico/.cloudflared/YOUR_TUNNEL_ID.json
+
+ingress:
+  - hostname: austriants.at
+    service: http://localhost:80
+
+  - hostname: memora.austriants.at
+    service: http://localhost:80
+
+  - hostname: api.austriants.at
+    service: http://localhost:80
+
+  - service: http_status:404
+
+
+sudo cloudflared service install
+sudo systemctl enable cloudflared
+sudo systemctl start cloudflared
+sudo systemctl status cloudflared
+
+
+
+
+
+THIS IS FRONTEND DEPLOY SCRIPT
+micro ~/Documents/Memora/deploy-memora-frontend.sh
+
+THIS IS BACKEND DEPLOY SCRIPT
+micro ~/Documents/Memora/deploy-memora-backend.sh

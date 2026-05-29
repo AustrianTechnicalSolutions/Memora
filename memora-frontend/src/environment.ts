@@ -1,5 +1,5 @@
 export const environment = {
     apiUrl: window.location.hostname === 'localhost'
     ? 'http://localhost:5000'
-    : 'https://api.austrianms.at'
+    : 'https://api.austriants.at'
 };

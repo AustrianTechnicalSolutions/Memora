@@ -1,47 +1,26 @@
 {
   "format": 1,
   "restore": {
-<<<<<<< HEAD
-    "/home/nico/Documents/Memora/memora-backend/memora-backend.csproj": {}
+    "C:\\Schule\\S4\\Heiko_Doli\\Projekt\\Memora\\memora-backend\\memora-backend.csproj": {}
   },
   "projects": {
-    "/home/nico/Documents/Memora/memora-backend/memora-backend.csproj": {
+    "C:\\Schule\\S4\\Heiko_Doli\\Projekt\\Memora\\memora-backend\\memora-backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/nico/Documents/Memora/memora-backend/memora-backend.csproj",
+        "projectUniqueName": "C:\\Schule\\S4\\Heiko_Doli\\Projekt\\Memora\\memora-backend\\memora-backend.csproj",
         "projectName": "memora-backend",
-        "projectPath": "/home/nico/Documents/Memora/memora-backend/memora-backend.csproj",
-        "packagesPath": "/home/nico/.nuget/packages/",
-        "outputPath": "/home/nico/Documents/Memora/memora-backend/obj/",
+        "projectPath": "C:\\Schule\\S4\\Heiko_Doli\\Projekt\\Memora\\memora-backend\\memora-backend.csproj",
+        "packagesPath": "C:\\Users\\nicok\\.nuget\\packages\\",
+        "outputPath": "C:\\Schule\\S4\\Heiko_Doli\\Projekt\\Memora\\memora-backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/nico/.nuget/NuGet/NuGet.Config"
-=======
-    "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\memora-backend\\memora-backend.csproj": {}
-  },
-  "projects": {
-    "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\memora-backend\\memora-backend.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\memora-backend\\memora-backend.csproj",
-        "projectName": "memora-backend",
-        "projectPath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\memora-backend\\memora-backend.csproj",
-        "packagesPath": "C:\\Users\\gajip\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gajip\\Music\\Spengergasse\\4BHIF\\PRE\\Memora\\Memora\\memora-backend\\obj\\",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "C:\\Users\\gajip\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
->>>>>>> origin/main
+          "C:\\Users\\nicok\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-<<<<<<< HEAD
-=======
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
->>>>>>> origin/main
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -60,7 +39,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -100,6 +79,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.22, 8.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.22, 8.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.22, 8.0.22]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.22, 8.0.22]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -108,7 +105,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/nico/.dotnet/sdk/10.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
